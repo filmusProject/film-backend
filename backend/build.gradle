@@ -37,7 +37,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	// swagger 의존성 추가
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-	// Sql 연결전 H2 데이터베이스로 프로그램 실행 결과를 확인하기 위한 의존성 추가
+	// Sql 연결 전 H2 데이터베이스로 프로그램 실행 결과를 확인하기 위한 의존성 추가
 	implementation 'com.h2database:h2'
 }
 
