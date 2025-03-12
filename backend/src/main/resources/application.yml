@@ -1,0 +1,36 @@
+spring:
+  profiles:
+    active: master  # 현재 활성화할 환경을 'master'로 설정 (추후 prod 등 다른 환경을 추가 가능)
+
+  security:
+    user:
+      name: admin  # 기본 로그인 계정 (ID)
+      password: admin  # 기본 로그인 비밀번호
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL  # H2 데이터베이스 사용 (메모리 기반), MySQL 모드 적용
+    driver-class-name: org.h2.Driver  # H2 데이터베이스의 JDBC 드라이버
+    username: sa  # H2 기본 사용자명
+    password:  # 기본적으로 비밀번호 없음 (공백 유지)
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect  # H2 데이터베이스에 맞는 Hibernate 설정
+    hibernate:
+      ddl-auto: update  # 애플리케이션 실행 시 DB 스키마 자동 업데이트 (실무에서는 'validate' 사용 추천)
+    properties:
+      hibernate:
+        format_sql: true  # SQL 쿼리를 보기 좋게 포맷팅하여 출력
+
+  h2:
+    console:
+      enabled: true  # H2 콘솔 활성화
+      path: /h2-console  # H2 웹 콘솔 접속 경로 (http://localhost:8080/h2-console)
+
+springdoc:
+  api-docs:
+    enabled: true  # Swagger API 문서 활성화
+    path: /v3/api-docs  # API 문서의 기본 경로 (http://localhost:8080/v3/api-docs)
+  swagger-ui:
+    path: /swagger-ui.html  # Swagger UI 접속 경로 (http://localhost:8080/swagger-ui.html)
+    operationsSorter: method  # API 목록을 HTTP 메서드(GET, POST 등) 기준으로 정렬
+    tagsSorter: alpha  # API 태그를 알파벳 순으로 정렬
