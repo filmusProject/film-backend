@@ -5,7 +5,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-// User 엔티티와 연결되는 JPA Repository
+// User 엔티티와 연결된 JPA Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByUsername(String username); // 사용자명(username)으로 사용자 찾기
+
+    // username으로 사용자 조회 (로그인 시 사용)
+    Optional<User> findByUsername(String username);
+
+    // email로 사용자 조회 (이메일 중복 체크 or 찾기 기능에 사용)
+    Optional<User> findByEmail(String email);
+
+    // username 중복 여부 확인 (true/false)
+    boolean existsByUsername(String username);
+
+    // email 중복 여부 확인 (true/false)
+    boolean existsByEmail(String email);
 }
