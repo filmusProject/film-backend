@@ -32,3 +32,8 @@ springdoc:
     path: /swagger-ui.html  # Swagger UI 접속 경로 (http://localhost:8080/swagger-ui.html)
     operationsSorter: method  # API 목록을 HTTP 메서드(GET, POST 등) 기준으로 정렬
     tagsSorter: alpha  # API 태그를 알파벳 순으로 정렬
+
+
+kmdb:
+  base-url: http://api.koreafilm.or.kr
+  service-key: 8Z02968DPIVWH3GL5FBO

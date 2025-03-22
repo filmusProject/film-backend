@@ -45,6 +45,10 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	
 
+	// openAPI 연결을 위한 webclient
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+
 }
 
 tasks.named('test') {
