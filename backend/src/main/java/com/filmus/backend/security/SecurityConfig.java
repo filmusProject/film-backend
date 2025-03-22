@@ -14,9 +14,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())  // CSRF 보호 비활성화 (H2 콘솔 사용 가능하도록 설정)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/h2-console/**").permitAll()  // H2 콘솔 접근 허용
-                        .requestMatchers("/api/auth/**").permitAll()  // 로그인 API 접근 허용
-                        .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
+                        .requestMatchers("/api/protected/**").authenticated()  // 인증이 필요한 경로
+                        .anyRequest().permitAll()  // 그 외 모든 요청은 허용
                 )
                 .headers(headers -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)) // 최신 방식 적용
