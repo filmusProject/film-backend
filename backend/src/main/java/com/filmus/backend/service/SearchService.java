@@ -43,7 +43,6 @@ public class SearchService {
                 .queryParam("startCount", startCount)
                 .queryParam("collection", "kmdb_new2")
                 .queryParam("detail", "Y")
-                .queryParam("ratedYn", "y")
                 .queryParam("query", req.query() == null ? "" : req.query());
 
 
