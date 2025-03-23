@@ -3,6 +3,7 @@ package com.filmus.backend.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
@@ -24,5 +25,10 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable());  // HTTP Basic 인증 비활성화
 
         return http.build();
+    }
+
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();  // 스프링이 이걸 Bean으로 등록함
     }
 }

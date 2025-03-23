@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @NoArgsConstructor  // 기본 생성자 자동 생성 (파라미터 없는 생성자)
 @AllArgsConstructor // 모든 필드를 인자로 받는 생성자 자동 생성
 @Builder  // 빌더 패턴 사용 가능: User.builder().username("test").build() 형태로 객체 생성 가능
+@Table(name = "users")
 public class User {
 
     @Id

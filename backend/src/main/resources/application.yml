@@ -24,6 +24,18 @@ spring:
       settings:
         web-allow-others: true  # 다른 IP에서도 접속 가능하도록 설정 (로컬 개발 환경에서는 필요 없음)
 
+  mail:
+    host: smtp.gmail.com  # Gmail SMTP 서버
+    port: 587  # TLS 포트
+    username: jisung494@gmail.com  # Gmail 주소 (발신자)
+    password: dfmd gdes wzmf syyv  # 앱 비밀번호 (Gmail 설정에서 생성한 전용 비밀번호)
+    properties:
+      mail:
+        smtp:
+          auth: true  # 인증 필요
+          starttls:
+            enable: true  # TLS 사용
+
 springdoc:
   api-docs:
     enabled: true  # Swagger API 문서 활성화
@@ -32,7 +44,6 @@ springdoc:
     path: /swagger-ui.html  # Swagger UI 접속 경로 (http://localhost:8080/swagger-ui.html)
     operationsSorter: method  # API 목록을 HTTP 메서드(GET, POST 등) 기준으로 정렬
     tagsSorter: alpha  # API 태그를 알파벳 순으로 정렬
-
 
 kmdb:
   base-url: http://api.koreafilm.or.kr

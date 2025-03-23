@@ -1,8 +1,6 @@
 package com.filmus.backend.controller;
 
-import com.filmus.backend.dto.LoginRequestDto;
-import com.filmus.backend.dto.SignupRequestDto;
-import com.filmus.backend.dto.TokenResponseDto;
+import com.filmus.backend.dto.*;
 import com.filmus.backend.security.JwtTokenProvider;
 import com.filmus.backend.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -70,4 +69,48 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    // 이메일 인증 확인용 엔드포인트
+    @GetMapping("/verify-email")
+    @Operation(summary = "이메일 인증 확인", description = "전송된 이메일의 토큰을 통해 이메일 인증을 처리합니다.")
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+        boolean success = authService.verifyEmail(token);  // 인증 처리 로직 호출
+        if (success) {
+            return ResponseEntity.ok("이메일 인증이 완료되었습니다.");
+        } else {
+            return ResponseEntity.badRequest().body("유효하지 않거나 만료된 토큰입니다.");
+        }
+    }
+
+    @Operation(summary = "아이디 찾기", description = "입력한 이메일로 등록된 사용자 아이디를 전송합니다.")
+    @PostMapping("/find-username")
+    public ResponseEntity<?> findUsername(@RequestParam String email) {
+        authService.sendUsernameToEmail(email);
+        return ResponseEntity.ok("입력한 이메일로 아이디를 전송했습니다.");
+    }
+
+    @Operation(summary = "임시 비밀번호 재설정", description = "이메일을 통해 임시 비밀번호를 발급받습니다.")
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequestDto request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok("입력하신 이메일로 임시 비밀번호를 전송했습니다.");
+    }
+
+
+    @Operation(summary = "비밀번호 변경", description = "현재 비밀번호와 새 비밀번호를 입력하여 비밀번호를 변경합니다.")
+    @PutMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @RequestBody ChangePasswordRequestDto request, // 비밀번호 변경 요청 DTO
+            Authentication authentication) { // JWT 인증 객체 (Spring Security가 자동으로 주입)
+
+        // JWT 인증된 사용자 이름 추출
+        String username = authentication.getName();
+
+        // 비밀번호 변경 로직 실행
+        authService.changePassword(username, request);
+
+        return ResponseEntity.ok("비밀번호가 성공적으로 변경되었습니다.");
+    }
+
+
 }
