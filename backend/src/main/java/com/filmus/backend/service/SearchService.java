@@ -3,7 +3,7 @@ package com.filmus.backend.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.filmus.backend.dto.MovieDTO;
-import com.filmus.backend.dto.SearchRequest;
+import com.filmus.backend.dto.SearchRequestDTO;
 import com.filmus.backend.dto.SearchResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +26,9 @@ public class SearchService {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public Mono<SearchResponseDTO> search(SearchRequest req){
+
+    // webclient를 통해 buildUri로 만든 api 주소로 요청을 보낸 뒤 응답반든 값을 parseResponse로 필요한 데이터만 불러와 SearchResponseDTO형식으로 반환
+    public Mono<SearchResponseDTO> search(SearchRequestDTO req){
         int listCount = 10;
         int startCount = (req.page() != null && req.page() > 0) ? (req.page() - 1) * listCount : 0;
 
@@ -36,7 +38,9 @@ public class SearchService {
                 .bodyToMono(String.class)
                 .map(this::parseResponse);
     }
-    private java.net.URI buildUri(UriBuilder builder, SearchRequest req, int listCount, int startCount) {
+
+    // searchController을 통해 전달받은 검색조건들로 KMDB에 요청할 api 주소를 빌드
+    private java.net.URI buildUri(UriBuilder builder, SearchRequestDTO req, int listCount, int startCount) {
         builder.path("/openapi-data2/wisenut/search_api/search_json2.jsp")
                 .queryParam("ServiceKey", serviceKey)
                 .queryParam("listCount", listCount)
@@ -68,6 +72,8 @@ public class SearchService {
         System.out.println("✅ 최종 요청 URI: " + uri);
         return uri;
     }
+
+    // KMDB에서 입력받은 json 데이터를 필요한 데이터들만 선별해 SearchResponseDTO 형식으로 반환
     private SearchResponseDTO parseResponse(String json) {
         try {
             JsonNode root = mapper.readTree(json);

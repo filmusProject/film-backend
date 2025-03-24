@@ -1,6 +1,8 @@
 package com.filmus.backend.dto;
 
-public record SearchRequest(
+
+// KMDB api를 요청할 때 검색어와 조건을 위한 DTO
+public record SearchRequestDTO(
         String query,
         Integer page,
         String createDts,

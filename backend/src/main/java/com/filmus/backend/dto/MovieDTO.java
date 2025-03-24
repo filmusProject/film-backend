@@ -1,5 +1,6 @@
 package com.filmus.backend.dto;
 
+// 프론트 반환을 위한 DTO
 public record MovieDTO(
         String docid,
         String movieId,

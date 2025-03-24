@@ -1,6 +1,6 @@
 package com.filmus.backend.controller;
 
-import com.filmus.backend.dto.SearchRequest;
+import com.filmus.backend.dto.SearchRequestDTO;
 import com.filmus.backend.dto.SearchResponseDTO;
 import com.filmus.backend.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,7 +20,7 @@ public class SearchController {
             description = "영화 제목, 감독, 배우 등의 정보를 기반으로 KMDb OpenAPI에서 영화를 검색합니다."
     )
     @GetMapping
-    public Mono<SearchResponseDTO> search(SearchRequest request) {
+    public Mono<SearchResponseDTO> search(SearchRequestDTO request) {
         return searchService.search(request);
     }
 }
