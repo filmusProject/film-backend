@@ -1,24 +1,28 @@
 package com.filmus.backend.dto;
 
-// 로그인 성공 시 클라이언트에게 반환할 JWT 토큰을 담는 DTO
+import io.swagger.v3.oas.annotations.media.Schema;
+
+/**
+ * 클라이언트에게 JWT 액세스/리프레시 토큰을 응답할 때 사용하는 DTO입니다.
+ */
 public class TokenResponseDto {
 
-    private String token; // 발급된 JWT 토큰
+    @Schema(description = "JWT 액세스 토큰", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6...")
+    private final String accessToken;
 
-    // 기본 생성자
-    public TokenResponseDto() {}
+    @Schema(description = "JWT 리프레시 토큰", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6...")
+    private final String refreshToken;
 
-    // 모든 필드를 초기화하는 생성자
-    public TokenResponseDto(String token) {
-        this.token = token;
+    public TokenResponseDto(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
-    // Getter와 Setter
-    public String getToken() {
-        return token;
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public String getRefreshToken() {
+        return refreshToken;
     }
 }

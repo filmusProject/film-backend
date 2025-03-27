@@ -39,7 +39,7 @@ public class EmailService {
         EmailVerificationToken verificationToken = EmailVerificationToken.builder()
                 .token(token)
                 .user(user)
-                .expirationDate(expirationTime)
+                .expiresAt(expirationTime)
                 .build();
 
         tokenRepository.save(verificationToken);
