@@ -6,5 +6,13 @@ import java.util.List;
 
 public record SearchResponseDTO(
         int totalCount,
-        List<MovieDTO> movies
-) {}
+        List<MovieSimpleDTO> movies
+) {
+    public record MovieSimpleDTO(
+            String movieId,
+            String movieSeq,
+            String title,
+            String year,
+            String posterUrl
+    ) {}
+}
