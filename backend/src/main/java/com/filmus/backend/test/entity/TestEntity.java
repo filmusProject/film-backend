@@ -10,6 +10,7 @@ public class TestEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "value")
     private int value;
 
     public TestEntity() {}
