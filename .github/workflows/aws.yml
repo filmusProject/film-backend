@@ -36,7 +36,6 @@ jobs:
     - name: Build Docker image
       run: |
         # backend 디렉토리로 이동하여 Dockerfile을 빌드
-        cd backend
         docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
 
     - name: Copy Docker image to EC2 instance
