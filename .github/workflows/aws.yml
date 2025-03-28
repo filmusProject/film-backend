@@ -42,10 +42,12 @@ jobs:
         chmod 600 ~/.ssh/id_rsa  # 비공개 키에 대한 올바른 권한 설정
 
     - name: Deploy Docker container to EC2
-      run: |
-        ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $EC2_USER@$EC2_INSTANCE << 'EOF'
-          cd $APP_DIR
-          docker stop filmus-backend-container || true
-          docker rm filmus-backend-container || true
-          docker run -d -p $PORT:8080 --name filmus-backend-container $DOCKER_IMAGE:$DOCKER_TAG
-        EOF
+  run: |
+    ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no $EC2_USER@$EC2_INSTANCE << 'EOF'
+      cd $APP_DIR
+      ./gradlew build
+      docker build -t $DOCKER_IMAGE:$DOCKER_TAG .
+      docker stop filmus-backend-container || true
+      docker rm filmus-backend-container || true
+      docker run -d -p $PORT:8080 --name filmus-backend-container $DOCKER_IMAGE:$DOCKER_TAG
+    EOF
