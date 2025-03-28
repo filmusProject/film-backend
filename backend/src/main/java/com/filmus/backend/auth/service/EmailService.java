@@ -80,6 +80,7 @@ public class EmailService {
 
             mailSender.send(message);     // 메일 전송 실행
         } catch (MessagingException e) {
+            e.printStackTrace();  // 디버깅을 위한 예외 출력
             throw new RuntimeException("이메일 전송 중 오류 발생: " + e.getMessage());
         }
     }
