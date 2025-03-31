@@ -34,19 +34,22 @@ jobs:
         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_INSTANCE << 'EOF'
           echo "✅ EC2 접속 성공"
           cd /home/ubuntu/film-backend
-          echo "📦 git pull 중..."
+    
+          echo "📦 git pull 중 (reset & clean 포함)..."
+          git reset --hard
+          git clean -fd
           git pull origin master
           
           echo "🛠️ 빌드 시작..."
           cd backend
           chmod +x ./gradlew
           ./gradlew build
-
+    
           echo "🐳 Docker 이미지 빌드 및 재배포"
           docker stop filmus-backend-container || true
           docker rm filmus-backend-container || true
           docker build -t filmus-backend:latest .
           docker run -d -p 80:8080 --name filmus-backend-container filmus-backend:latest
-
+    
           echo "🚀 배포 완료"
         EOF
