@@ -8,6 +8,7 @@ public record SearchResponseDTO(
         int totalCount,
         List<MovieSimpleDTO> movies
 ) {
+
     public record MovieSimpleDTO(
             String movieId,
             String movieSeq,
