@@ -1,4 +1,4 @@
-name: Deploy to EC2 (no ECR)
+name: Deploy to EC2 (Docker on EC2 directly)
 
 on:
   push:
@@ -30,13 +30,13 @@ jobs:
           echo "✅ EC2 접속 완료"
 
           echo "📦 최신 코드 가져오기"
-          cd $APP_DIR
+          cd /home/ubuntu/film-backend
           git reset --hard
           git clean -fd
           git pull origin master
 
           echo "🛠 Spring Boot 빌드"
-          cd backend
+          cd /home/ubuntu/film-backend/backend
           chmod +x ./gradlew
           ./gradlew clean build --no-daemon
 
@@ -44,6 +44,7 @@ jobs:
           docker stop $CONTAINER_NAME || true
           docker rm $CONTAINER_NAME || true
           docker build -t $CONTAINER_NAME .
+
           docker run -d -p $PORT:8080 --name $CONTAINER_NAME $CONTAINER_NAME
 
           echo "🚀 배포 완료"
