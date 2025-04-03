@@ -1,8 +1,9 @@
-# Java 21이 설치된 공식 이미지 기반
+# Base image with Java 21
 FROM openjdk:21-jdk-slim
 
-# JAR 파일을 컨테이너에 복사
-COPY build/libs/*.jar app.jar
+# JAR 복사 - JAR 이름이 고정되면 더 안정적
+ARG JAR_FILE=build/libs/filmus-backend-0.0.1-SNAPSHOT.jar
+COPY ${JAR_FILE} app.jar
 
-# 앱 실행
+# 실행
 ENTRYPOINT ["java", "-jar", "/app.jar"]

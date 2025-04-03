@@ -11,7 +11,7 @@ env:
   SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
   CONTAINER_NAME: filmus-backend-container
   APP_DIR: /home/ubuntu/film-backend/backend
-  PORT: 80
+  PORT: 8080
 
 jobs:
   deploy:
