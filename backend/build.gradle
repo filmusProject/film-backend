@@ -13,7 +13,7 @@ java {
 	}
 }
 
-jar {
+bootJar {
 	archiveFileName = "filmus-backend.jar"
 }
 
