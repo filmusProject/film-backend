@@ -1,4 +1,4 @@
-package com.filmus.backend.auth.entity;
+package com.filmus.backend.user.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,12 +33,15 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email; // 이메일 주소 (중복 불가)
 
+    @Setter
     @Column(nullable = false)
     private String nickname; // 사용자 닉네임
 
+    @Setter
     @Column
     private String gender; // 성별 (선택값)
 
+    @Setter
     @Column(name = "birth_date")
     private LocalDate birthDate; // 생년월일 (선택값)
 

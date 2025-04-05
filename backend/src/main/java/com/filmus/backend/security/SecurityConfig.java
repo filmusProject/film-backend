@@ -1,5 +1,6 @@
-package com.filmus.backend.auth.security;
+package com.filmus.backend.security;
 
+import com.filmus.backend.token.service.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

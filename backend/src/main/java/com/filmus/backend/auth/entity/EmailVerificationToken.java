@@ -1,11 +1,13 @@
 package com.filmus.backend.auth.entity;
 
+import com.filmus.backend.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 이메일 인증을 위한 토큰 정보를 저장하는 엔티티입니다.
@@ -16,10 +18,6 @@ import java.time.LocalDateTime;
 public class EmailVerificationToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
     private String token;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,10 +34,10 @@ public class EmailVerificationToken {
      * 생성자에 @Builder를 적용해 외부에서 빌더 방식으로 객체 생성 가능하게 합니다.
      */
     @Builder
-    public EmailVerificationToken(String token, User user, LocalDateTime expiresAt) {
-        this.token = token;
+    public EmailVerificationToken(User user) {
+        this.token = UUID.randomUUID().toString();
         this.user = user;
-        this.expiresAt = expiresAt;
+        this.expiresAt = LocalDateTime.now().plusMinutes(30);
     }
 
     /**

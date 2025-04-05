@@ -1,6 +1,6 @@
-package com.filmus.backend.auth.repository;
+package com.filmus.backend.user.repository;
 
-import com.filmus.backend.auth.entity.User;
+import com.filmus.backend.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

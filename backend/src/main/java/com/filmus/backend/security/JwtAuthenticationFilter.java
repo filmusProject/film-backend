@@ -1,7 +1,8 @@
-package com.filmus.backend.auth.security;
+package com.filmus.backend.security;
 
-import com.filmus.backend.auth.entity.User;
-import com.filmus.backend.auth.repository.UserRepository;
+import com.filmus.backend.token.service.JwtTokenProvider;
+import com.filmus.backend.user.entity.User;
+import com.filmus.backend.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

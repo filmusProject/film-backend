@@ -1,7 +1,7 @@
-package com.filmus.backend.auth.repository;
+package com.filmus.backend.token.repository;
 
-import com.filmus.backend.auth.entity.RefreshToken;
-import com.filmus.backend.auth.entity.User;
+import com.filmus.backend.token.entity.RefreshToken;
+import com.filmus.backend.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -15,5 +15,7 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     Optional<RefreshToken> findByUser(User user);
 
     // 사용자 기반으로 리프레시 토큰 삭제
-    void deleteByUser(User user);
+    void deleteByUserId(Long userId);
+
+    Optional<RefreshToken> findByUserId(Long userId);
 }

@@ -1,4 +1,4 @@
-package com.filmus.backend.auth.dto;
+package com.filmus.backend.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;

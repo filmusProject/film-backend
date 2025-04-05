@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class LoginRequestDto {
 
     @Schema(description = "사용자 ID", example = "testuser")
-    private String username; // 사용자의 아이디 또는 이메일
+    private String email; // 사용자의 아이디 또는 이메일
 
     @Schema(description = "비밀번호", example = "testpassword")
     private String password; // 사용자의 비밀번호
@@ -15,18 +15,18 @@ public class LoginRequestDto {
     public LoginRequestDto() {}
 
     // 모든 필드를 초기화하는 생성자
-    public LoginRequestDto(String username, String password) {
-        this.username = username;
+    public LoginRequestDto(String email, String password) {
+        this.email = email;
         this.password = password;
     }
 
     // Getter와 Setter
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setemail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

@@ -1,7 +1,7 @@
-package com.filmus.backend.auth.service;
+package com.filmus.backend.user.service;
 
-import com.filmus.backend.auth.entity.User;
-import com.filmus.backend.auth.repository.UserRepository;
+import com.filmus.backend.user.entity.User;
+import com.filmus.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,9 +21,7 @@ public class ChangePasswordService {
      * 사용자의 현재 비밀번호를 검증하고 새 비밀번호로 변경합니다.
      */
     @Transactional
-    public boolean changePassword(String username, String currentPassword, String newPassword) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+    public boolean changePassword(User user, String currentPassword, String newPassword) {
 
         // 현재 비밀번호 검증
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {

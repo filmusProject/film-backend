@@ -1,5 +1,6 @@
-package com.filmus.backend.auth.entity;
+package com.filmus.backend.token.entity;
 
+import com.filmus.backend.user.entity.User;
 import jakarta.persistence.*;
 
 /**

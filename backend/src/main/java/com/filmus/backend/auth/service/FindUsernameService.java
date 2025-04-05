@@ -1,7 +1,7 @@
 package com.filmus.backend.auth.service;
 
-import com.filmus.backend.auth.entity.User;
-import com.filmus.backend.auth.repository.UserRepository;
+import com.filmus.backend.user.entity.User;
+import com.filmus.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
