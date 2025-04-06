@@ -2,6 +2,8 @@ package com.filmus.backend.movie.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.filmus.backend.common.exception.CustomException;
+import com.filmus.backend.common.exception.ErrorCode;
 import com.filmus.backend.movie.dto.MovieDTO;
 import com.filmus.backend.movie.dto.SearchRequestDTO;
 import com.filmus.backend.movie.dto.SearchResponseDTO;
@@ -43,11 +45,11 @@ public class MovieService {
                     .retrieve()
                     .bodyToMono(String.class)
                     .blockOptional()
-                    .orElseThrow(() -> new RuntimeException("KMDb 응답이 없습니다."));
+                    .orElseThrow(() -> new CustomException(ErrorCode.KMDB_NO_RESPONSE));
 
             return processSearchResponse(response);
         } catch (Exception e) {
-            throw new RuntimeException("영화 검색 중 오류가 발생했습니다.", e);
+            throw new CustomException(ErrorCode.KMDB_SEARCH_FAILED);
         }
     }
 
@@ -66,11 +68,11 @@ public class MovieService {
                     .retrieve()
                     .bodyToMono(String.class)
                     .blockOptional()
-                    .orElseThrow(() -> new RuntimeException("KMDb 응답이 없습니다."));
+                    .orElseThrow(() -> new CustomException(ErrorCode.KMDB_NO_RESPONSE));
 
             return processDetailResponse(response);
         } catch (Exception e) {
-            throw new RuntimeException("영화 상세 조회 중 오류가 발생했습니다.", e);
+            throw new CustomException(ErrorCode.MOVIE_DETAIL_FAILED);
         }
     }
 
@@ -155,7 +157,7 @@ public class MovieService {
             int totalCount = dataNode.path("TotalCount").asInt();
             return new SearchResponseDTO(totalCount, movies);
         } catch (Exception e) {
-            throw new RuntimeException("검색 응답 처리 중 오류가 발생했습니다.", e);
+            throw new CustomException(ErrorCode.KMDB_PARSE_FAILED);
         }
     }
 
@@ -169,14 +171,14 @@ public class MovieService {
             JsonNode resultArray = dataNode.path("Result");
 
             if (resultArray.isEmpty()) {
-                throw new RuntimeException("상세 검색 결과가 없습니다.");
+                throw new CustomException(ErrorCode.MOVIE_DETAIL_NOT_FOUND);
             }
 
             JsonNode node = resultArray.get(0);
             Movie movie = saveOrUpdate(node); // 저장 또는 갱신
             return convertToDTO(movie);
         } catch (Exception e) {
-            throw new RuntimeException("상세 응답 처리 중 오류가 발생했습니다.", e);
+            throw new CustomException(ErrorCode.KMDB_PARSE_FAILED);
         }
     }
 

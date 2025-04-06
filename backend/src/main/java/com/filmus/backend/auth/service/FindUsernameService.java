@@ -1,5 +1,7 @@
 package com.filmus.backend.auth.service;
 
+import com.filmus.backend.common.exception.CustomException;
+import com.filmus.backend.common.exception.ErrorCode;
 import com.filmus.backend.user.entity.User;
 import com.filmus.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +23,14 @@ public class FindUsernameService {
      * 입력된 이메일에 해당하는 사용자에게 아이디를 전송합니다.
      */
     public boolean sendUsernameToEmail(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (optionalUser.isPresent()) {
-            String username = optionalUser.get().getUsername();
-            String subject = "[Filmus] 아이디 찾기 결과";
-            String content = "회원님의 아이디는 다음과 같습니다: " + username;
-            emailService.sendEmail(email, subject, content);
-            return true;
-        }
+        String username = user.getUsername();
+        String subject = "[Filmus] 아이디 찾기 결과";
+        String content = "회원님의 아이디는 다음과 같습니다: " + username;
 
-        return false; // 해당 이메일을 가진 사용자가 없음
+        emailService.sendEmail(email, subject, content);
+        return true;
     }
 }

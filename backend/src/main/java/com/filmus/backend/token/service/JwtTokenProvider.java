@@ -1,10 +1,11 @@
 package com.filmus.backend.token.service;
 
+import com.filmus.backend.common.exception.CustomException;
+import com.filmus.backend.common.exception.ErrorCode;
 import com.filmus.backend.user.entity.User;
 import io.jsonwebtoken.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
@@ -43,10 +44,14 @@ public class JwtTokenProvider {
     }
 
     public String getSubject(String token) {
-        return Jwts.parser().setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+        try {
+            return Jwts.parser().setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INVALID_JWT);
+        }
     }
 
     public boolean validateToken(String token) {

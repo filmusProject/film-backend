@@ -1,5 +1,7 @@
 package com.filmus.backend.token.service;
 
+import com.filmus.backend.common.exception.CustomException;
+import com.filmus.backend.common.exception.ErrorCode;
 import com.filmus.backend.token.entity.RefreshToken;
 import com.filmus.backend.user.entity.User;
 import com.filmus.backend.token.repository.RefreshTokenRepository;
@@ -47,19 +49,19 @@ public class TokenService {
 
     public String reissueAccessToken(String refreshToken) {
         if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new IllegalArgumentException("유효하지 않은 리프레시 토큰입니다.");
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         String email = jwtTokenProvider.getSubject(refreshToken);
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 정보 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         RefreshToken stored = refreshTokenRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new IllegalArgumentException("저장된 리프레시 토큰이 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND));
 
         if (!stored.getToken().equals(refreshToken)) {
-            throw new IllegalArgumentException("리프레시 토큰이 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.REFRESH_TOKEN_MISMATCH);
         }
 
         return jwtTokenProvider.createAccessToken(user);

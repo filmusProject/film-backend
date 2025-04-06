@@ -1,6 +1,8 @@
 package com.filmus.backend.auth.service;
 
 import com.filmus.backend.auth.entity.EmailVerificationToken;
+import com.filmus.backend.common.exception.CustomException;
+import com.filmus.backend.common.exception.ErrorCode;
 import com.filmus.backend.user.entity.User;
 import com.filmus.backend.auth.repository.EmailVerificationTokenRepository;
 import com.filmus.backend.user.repository.UserRepository;
@@ -16,13 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmailVerificationService {
 
     private final EmailVerificationTokenRepository tokenRepository;
-    private final UserRepository userRepository;
 
     //생성 후 저장
     public String generateToken(User user){
         // 기존 토큰이 있다면 삭제
         tokenRepository.deleteByUser(user);
-
         //토큰 새로 생성
         EmailVerificationToken emailVerificationToken = new EmailVerificationToken(user);
         //토큰 저장
@@ -37,10 +37,10 @@ public class EmailVerificationService {
     @Transactional
     public boolean verifyEmailToken(String token) {
         EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 토큰입니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
 
         if (verificationToken.isExpired()) {
-            throw new IllegalArgumentException("토큰이 만료되었습니다.");
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
         }
 
         User user = verificationToken.getUser();

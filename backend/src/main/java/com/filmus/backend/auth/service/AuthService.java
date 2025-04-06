@@ -2,6 +2,8 @@ package com.filmus.backend.auth.service;
 
 import com.filmus.backend.auth.dto.LoginRequestDto;
 import com.filmus.backend.auth.dto.SignupRequestDto;
+import com.filmus.backend.common.exception.CustomException;
+import com.filmus.backend.common.exception.ErrorCode;
 import com.filmus.backend.token.service.JwtTokenProvider;
 import com.filmus.backend.common.util.CookieUtil;
 import com.filmus.backend.token.service.TokenService;
@@ -50,7 +52,7 @@ public class AuthService {
      */
     public User findUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
     /**
@@ -84,14 +86,14 @@ public class AuthService {
 
     public String login(LoginRequestDto request, HttpServletResponse response) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("이메일 또는 비밀번호가 올바르지 않습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.INVALID_CREDENTIALS));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("이메일 또는 비밀번호가 올바르지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_CREDENTIALS);
         }
 
         if (!user.isVerified()) {
-            throw new AuthenticationCredentialsNotFoundException("이메일 인증이 필요합니다.");
+            throw new CustomException(ErrorCode.EMAIL_NOT_VERIFIED);
         }
 
         String accessToken = jwtTokenProvider.createAccessToken(user);
@@ -115,10 +117,10 @@ public class AuthService {
     public void signup(SignupRequestDto request) {
         // username/email 중복 여부 검사
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+            throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
 
         // 비밀번호 암호화 후 User 엔티티 생성

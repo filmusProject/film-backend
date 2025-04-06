@@ -1,5 +1,7 @@
 package com.filmus.backend.user.service;
 
+import com.filmus.backend.common.exception.CustomException;
+import com.filmus.backend.common.exception.ErrorCode;
 import com.filmus.backend.token.service.TokenService;
 import com.filmus.backend.user.dto.ChangePasswordRequestDto;
 import com.filmus.backend.user.dto.UpdateUserInfoRequestDto;
@@ -48,7 +50,7 @@ public class UserService {
     @Transactional
     public void changePassword(User user, ChangePasswordRequestDto request) {
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new BadCredentialsException("현재 비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
         }
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);

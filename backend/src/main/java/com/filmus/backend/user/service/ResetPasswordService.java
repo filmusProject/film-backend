@@ -1,6 +1,8 @@
 package com.filmus.backend.user.service;
 
 import com.filmus.backend.auth.service.EmailService;
+import com.filmus.backend.common.exception.CustomException;
+import com.filmus.backend.common.exception.ErrorCode;
 import com.filmus.backend.user.entity.User;
 import com.filmus.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +29,8 @@ public class ResetPasswordService {
      */
     @Transactional
     public boolean resetPassword(String email) {
-        Optional<User> optionalUser = userRepository.findByEmail(email);
-
-        if (optionalUser.isEmpty()) {
-            return false;
-        }
-
-        User user = optionalUser.get();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         // 임시 비밀번호 생성 (8자리 랜덤 UUID 앞부분)
         String tempPassword = UUID.randomUUID().toString().substring(0, 8);

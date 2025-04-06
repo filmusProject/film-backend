@@ -5,7 +5,6 @@ import com.filmus.backend.security.UserDetailsImpl;
 import com.filmus.backend.user.dto.ChangePasswordRequestDto;
 import com.filmus.backend.user.dto.UpdateUserInfoRequestDto;
 import com.filmus.backend.user.dto.UserInfoResponseDto;
-import com.filmus.backend.user.service.ChangePasswordService;
 import com.filmus.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final ChangePasswordService changePasswordService;
 
     @Operation(summary = "내 정보 조회", description = "로그인한 사용자의 정보를 반환합니다.")
     @GetMapping("/me")

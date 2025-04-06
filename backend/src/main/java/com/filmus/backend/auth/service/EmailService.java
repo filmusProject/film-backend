@@ -1,6 +1,8 @@
 package com.filmus.backend.auth.service;
 
-import com.filmus.backend.auth.entity.EmailVerificationToken;
+
+import com.filmus.backend.common.exception.ErrorCode;
+import com.filmus.backend.common.exception.CustomException;
 import com.filmus.backend.user.entity.User;
 import com.filmus.backend.auth.repository.EmailVerificationTokenRepository;
 import jakarta.transaction.Transactional;
@@ -14,8 +16,8 @@ import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
-import java.util.UUID;
+
+
 @Slf4j
 @Service  // 서비스 레이어로 선언
 @RequiredArgsConstructor  // final 필드 기반 생성자 자동 생성
@@ -57,6 +59,7 @@ public class EmailService {
             log.info("메일 발송 성공", user.getEmail());
         } catch (Exception e) {
             log.error("메일 발송 실패", e);
+            throw new CustomException(ErrorCode.EMAIL_SEND_FAILED);
         }
     }
 
@@ -73,8 +76,8 @@ public class EmailService {
 
             mailSender.send(message);     // 메일 전송 실행
         } catch (MessagingException e) {
-            e.printStackTrace();  // 디버깅을 위한 예외 출력
-            throw new RuntimeException("이메일 전송 중 오류 발생: " + e.getMessage());
+            log.error("일반 메일 발송 실패", e);
+            throw new CustomException(ErrorCode.EMAIL_SEND_FAILED);
         }
     }
 }

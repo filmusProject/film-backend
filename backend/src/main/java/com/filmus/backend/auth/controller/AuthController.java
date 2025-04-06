@@ -2,13 +2,9 @@ package com.filmus.backend.auth.controller;
 
 import com.filmus.backend.auth.dto.*;
 import com.filmus.backend.security.UserDetailsImpl;
-import com.filmus.backend.user.dto.ChangePasswordRequestDto;
-import com.filmus.backend.user.entity.User;
 import com.filmus.backend.token.service.JwtTokenProvider;
 import com.filmus.backend.auth.service.*;
 import com.filmus.backend.token.service.TokenService;
-import com.filmus.backend.user.service.ChangePasswordService;
-import com.filmus.backend.user.service.ResetPasswordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -22,9 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -41,8 +35,7 @@ public class AuthController {
     private final TokenService tokenService;
     private final EmailVerificationService emailVerificationService;
     private final FindUsernameService findUsernameService;
-    private final ResetPasswordService resetPasswordService;
-    private final ChangePasswordService changePasswordService;
+
 
 
 
