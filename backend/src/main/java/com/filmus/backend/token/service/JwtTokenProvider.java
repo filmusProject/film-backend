@@ -17,22 +17,37 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private static final long ACCESS_TOKEN_EXPIRE = 1000 * 60 * 15; // 15분
+    private static final long ACCESS_TOKEN_EXPIRE = 1000 * 60 * 15;       // 15분
     private static final long REFRESH_TOKEN_EXPIRE = 1000 * 60 * 60 * 24 * 7; // 7일
 
     @PostConstruct
     protected void init() {
+        // secretKey를 Base64로 인코딩 (토큰 파싱용)
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
+    /**
+     * AccessToken 생성
+     * Subject 부분에 User의 numeric ID를 넣는다.
+     */
     public String createAccessToken(User user) {
-        return createToken(user.getEmail(), ACCESS_TOKEN_EXPIRE);
+        // PK(Long) → String으로 변환해서 subject로 사용
+        return createToken(String.valueOf(user.getId()), ACCESS_TOKEN_EXPIRE);
     }
 
+    /**
+     * RefreshToken 생성
+     * Subject에 User ID를 동일하게 넣고, 유효기간만 다름.
+     */
     public String createRefreshToken(User user) {
-        return createToken(user.getEmail(), REFRESH_TOKEN_EXPIRE);
+        return createToken(String.valueOf(user.getId()), REFRESH_TOKEN_EXPIRE);
     }
 
+    /**
+     * JWT 토큰 생성 메서드
+     * Subject = User의 numeric ID
+     * expireTimeMillis 만큼 유효기간
+     */
     private String createToken(String subject, long expireTimeMillis) {
         Date now = new Date();
         return Jwts.builder()
@@ -43,9 +58,13 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     * 토큰에서 Subject(=User ID)를 추출
+     */
     public String getSubject(String token) {
         try {
-            return Jwts.parser().setSigningKey(secretKey)
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
                     .parseClaimsJws(token)
                     .getBody()
                     .getSubject();
@@ -54,6 +73,9 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     * 토큰 유효성 검사
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
@@ -63,11 +85,11 @@ public class JwtTokenProvider {
         }
     }
 
+    /**
+     * userId(Subject) 반환용.
+     * 편의 메서드: 내부적으로 getSubject() 사용
+     */
     public String getUserId(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject(); // ← subject에 userId 넣었다면 이거 맞음
+        return getSubject(token);
     }
 }

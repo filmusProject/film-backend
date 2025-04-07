@@ -44,27 +44,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        // 1. Authorization 헤더에서 토큰 추출
         String token = resolveToken(request);
         log.info("[JwtFilter] Authorization 헤더에서 추출한 토큰: {}", token);
 
-        // 2. 토큰이 존재하고 유효한 경우만 처리
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
             try {
-                String userId = jwtTokenProvider.getUserId(token);
+                String userId = jwtTokenProvider.getUserId(token); // "4" 같은 user PK
                 log.info("[JwtFilter] JWT에서 추출한 사용자 ID: {}", userId);
 
                 User user = userRepository.findById(Long.parseLong(userId)).orElse(null);
                 log.info("[JwtFilter] DB에서 조회한 사용자: {}", user != null ? user.getUsername() : "null");
 
                 if (user != null) {
+                    // ✅ 여기서 UserDetailsImpl로 감싸서 Principal 설정
+                    UserDetailsImpl userDetails = new UserDetailsImpl(user);
+
                     UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(user, null, List.of(() -> "ROLE_USER"));
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities() // "ROLE_USER" 등
+                            );
 
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    log.info("[JwtFilter] SecurityContext에 인증 정보 설정 완료. 인증된 사용자: {}", 
+                    log.info("[JwtFilter] SecurityContext에 인증 정보 설정 완료. 인증된 사용자: {}",
                             SecurityContextHolder.getContext().getAuthentication().getPrincipal());
                 } else {
                     log.warn("[JwtFilter] 사용자를 찾을 수 없음. userId: {}", userId);
@@ -79,7 +84,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // 3. 다음 필터로 요청 전달
         filterChain.doFilter(request, response);
     }
 

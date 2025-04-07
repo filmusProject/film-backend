@@ -78,8 +78,13 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                     HttpServletResponse response) {
-        authService.logout(userDetails.getUser(), response);
-        return ResponseEntity.ok("로그아웃 완료");
+        if (userDetails == null) {
+            // 이미 로그아웃된 상태거나 인증이 없음
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("이미 로그아웃된 상태이거나 유효하지 않은 토큰입니다.");
+        }
+        authService.logout(userDetails.getUser(),response);
+        return ResponseEntity.ok("로그아웃 성공");
     }
 
 

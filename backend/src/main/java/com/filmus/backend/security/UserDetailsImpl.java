@@ -8,56 +8,49 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- * 인증된 사용자 정보를 담는 UserDetails 구현체
- * Spring Security는 인증된 사용자를 내부적으로 UserDetails 라는 인터페이스로 다뤄.
- * → 그런데 너는 User라는 엔티티를 쓰고 있잖아?
- *
- * 그래서 UserDetailsImpl을 만들어서, User 객체를 감싸고
- * → Spring Security가 인식할 수 있게 해주는 거야.
- */
 @Getter
 public class UserDetailsImpl implements UserDetails {
 
-    private final User user;
+    private final User user; // 실제 도메인 엔티티
 
     public UserDetailsImpl(User user) {
         this.user = user;
     }
 
+    // 스프링 시큐리티가 요구하는 기본 메서드들 구현
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // 권한이 없다면 빈 리스트 반환
-        return Collections.emptyList();
+        // 예: 단일권한 ROLE_USER 만 준다거나, DB에서 꺼내온다거나
+        return Collections.singletonList(() -> "ROLE_USER");
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword(); // 실제 암호화된 비밀번호
+        return user.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername(); // username 필드 기준
+        return user.getEmail(); // 로그인 id로 email을 쓸 수도 있고 username을 쓸 수도 있음
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // 계정 만료 여부 (true = 만료 안됨)
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // 잠긴 계정 여부
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // 비밀번호 만료 여부
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // 계정 활성화 여부
+        return true;
     }
 }
