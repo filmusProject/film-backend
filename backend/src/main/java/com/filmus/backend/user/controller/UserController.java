@@ -22,12 +22,13 @@ public class UserController {
     private final UserService userService;
 
     @Operation(summary = "내 정보 조회", description = "로그인한 사용자의 정보를 반환합니다.")
-    // Controller
     @GetMapping("/me")
     public ResponseEntity<UserInfoResponseDto> getMyInfo(
             @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        // userDetails.getUser() 가능
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build(); // 또는 custom error 처리
+        }
         return ResponseEntity.ok(userService.getUserInfo(userDetails.getUser()));
     }
 
