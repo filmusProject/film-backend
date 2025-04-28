@@ -39,7 +39,11 @@ public enum ErrorCode {
     // ⚙️ 시스템/서버 에러
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SYS_001", "서버 오류입니다."),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "SYS_002", "잘못된 요청입니다."),
-    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "SYS_003", "허용되지 않은 HTTP 메서드입니다.");
+    METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "SYS_003", "허용되지 않은 HTTP 메서드입니다."),
+
+    // 리뷰 관련
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW_001", "리뷰를 찾을 수 없습니다."),
+    REVIEW_NO_PERMISSION(HttpStatus.FORBIDDEN, "REVIEW_002", "수정/삭제 권한이 없습니다.");;
 
     private final HttpStatus httpStatus;
     private final String code;

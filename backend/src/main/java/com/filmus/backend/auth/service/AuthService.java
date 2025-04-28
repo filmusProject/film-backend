@@ -122,6 +122,8 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
         }
+        // 요청에서 role이 안 왔으면 기본 ROLE_USER
+        String role = (request.getRole() != null) ? request.getRole() : "ROLE_USER";
 
         // 비밀번호 암호화 후 User 엔티티 생성
         String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -133,6 +135,7 @@ public class AuthService {
                 .gender(request.getGender())
                 .birthDate(LocalDate.parse(request.getBirthDate()))
                 .isVerified(false)  // ★ 명시적으로 false 설정
+                .role(role)
                 .build();
 
         // 1. DB에 사용자 저장 → ID가 생성되어 외래 키 참조 가능해짐
@@ -152,5 +155,30 @@ public class AuthService {
         // 클라이언트 쿠키 삭제
         Cookie expiredCookie = cookieUtil.deleteCookie("refreshToken");
         response.addCookie(expiredCookie);
+    }
+
+    @Transactional
+    public void adminSignup(SignupRequestDto request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
+        }
+
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+        User newUser = User.builder()
+                .username(request.getUsername())
+                .password(encodedPassword)
+                .email(request.getEmail())
+                .nickname(request.getNickname())
+                .gender(request.getGender())
+                .birthDate(LocalDate.parse(request.getBirthDate()))
+                .isVerified(true) // 관리자라면 바로 인증 처리할 수도 있음
+                .role("ROLE_ADMIN") // 👈 무조건 ROLE_ADMIN
+                .build();
+
+        userRepository.save(newUser);
     }
 }

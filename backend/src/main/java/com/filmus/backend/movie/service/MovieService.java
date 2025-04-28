@@ -231,6 +231,7 @@ public class MovieService {
         movie.setVodClass(node.path("vodClass").asText());
         movie.setVodUrl(node.path("vodUrl").asText());
         movie.setAwards1(node.path("Awards1").asText());
+        movie.setPlotKeywords(node.path("plotKeywords").asText());
 
         return movieRepository.save(movie);
     }
@@ -265,7 +266,8 @@ public class MovieService {
                 movie.getStillUrl(),
                 movie.getVodClass(),
                 movie.getVodUrl(),
-                movie.getAwards1()
+                movie.getAwards1(),
+                movie.getPlotKeywords()
         );
     }
 

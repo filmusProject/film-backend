@@ -27,5 +27,6 @@ public record MovieDTO(
         String stillUrl,
         String vodClass,
         String vodUrl,
-        String awards1
+        String awards1,
+        String plotKeywords
 ) {}
