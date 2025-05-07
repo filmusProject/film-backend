@@ -241,6 +241,7 @@ public class MovieService {
      */
     private MovieDTO convertToDTO(Movie movie) {
         return new MovieDTO(
+                movie.getId(),
                 movie.getDocid(),
                 movie.getMovieId(),
                 movie.getMovieSeq(),

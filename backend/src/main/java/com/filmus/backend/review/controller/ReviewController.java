@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
 @Tag(name = "리뷰 API", description = "영화 한줄평(리뷰) 작성, 수정, 삭제, 조회 기능 제공")
 public class ReviewController {
 
@@ -49,8 +49,15 @@ public class ReviewController {
     }
 
     @Operation(summary = "영화별 리뷰 조회", description = "특정 영화에 대한 모든 리뷰를 조회합니다.")
-    @GetMapping("/movie/{movieId}")
-    public List<ReviewResponseDTO> getReviewsByMovie(@PathVariable Long movieId) {
+    @GetMapping("/movie/{dbid}")
+    public List<ReviewResponseDTO> getReviewsByMovie(@PathVariable("dbid") Long movieId) {
         return reviewService.getReviewsByMovie(movieId);
+    }
+
+    @Operation(summary = "내 리뷰 조회", description = "로그인한 사용자가 작성한 모든 리뷰를 조회합니다.")
+    @GetMapping("/me")
+    public List<ReviewResponseDTO> getMyReviews(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getUserId();
+        return reviewService.getReviewsByUser(userId);
     }
 }

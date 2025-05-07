@@ -35,6 +35,9 @@ public enum ErrorCode {
     MOVIE_DETAIL_FAILED(HttpStatus.BAD_GATEWAY, "MOVIE_003", "영화 상세 정보 요청 중 오류가 발생했습니다."),
     MOVIE_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "MOVIE_004", "해당 영화 상세 정보를 찾을 수 없습니다."),
     KMDB_PARSE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "MOVIE_005", "KMDb 응답을 처리하는 중 오류가 발생했습니다."),
+    MOVIE_NOT_FOUND(HttpStatus.NOT_FOUND, "MOVIE_006", "해당 영화를 찾을 수 없습니다."),
+    DUPLICATE_BOOKMARK(HttpStatus.CONFLICT, "MOVIE_007", "이미 찜한 영화입니다."),
+    BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "MOVIE_008", "찜한 영화가 존재하지 않습니다."),
 
     // ⚙️ 시스템/서버 에러
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SYS_001", "서버 오류입니다."),
@@ -43,7 +46,10 @@ public enum ErrorCode {
 
     // 리뷰 관련
     REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW_001", "리뷰를 찾을 수 없습니다."),
-    REVIEW_NO_PERMISSION(HttpStatus.FORBIDDEN, "REVIEW_002", "수정/삭제 권한이 없습니다.");;
+    REVIEW_NO_PERMISSION(HttpStatus.FORBIDDEN, "REVIEW_002", "수정/삭제 권한이 없습니다."),
+    DUPLICATE_LIKE(HttpStatus.CONFLICT, "REVIEW_003", "이미 좋아요를 누른 리뷰입니다."),
+    LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW_004", "좋아요 기록이 존재하지 않습니다.");
+
 
     private final HttpStatus httpStatus;
     private final String code;

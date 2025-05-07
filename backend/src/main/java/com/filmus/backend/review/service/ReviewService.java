@@ -81,4 +81,25 @@ public class ReviewService {
                         .build())
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 사용자별 리뷰 조회
+     */
+    @Transactional(readOnly = true)
+    public List<ReviewResponseDTO> getReviewsByUser(Long userId) {
+        List<Review> reviews = reviewRepository.findByUserId(userId);
+
+        return reviews.stream()
+                .map(review -> ReviewResponseDTO.builder()
+                        .reviewId(review.getId())
+                        .rating((float) review.getRating())
+                        .content(review.getContent())
+                        .userId(review.getUserId())
+                        .createdAt(review.getCreatedAt())
+                        .updatedAt(review.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
 }

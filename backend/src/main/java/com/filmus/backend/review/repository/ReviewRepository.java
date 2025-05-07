@@ -12,4 +12,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // 특정 유저가 쓴 특정 리뷰 찾기 (수정, 삭제할 때 본인 검증용)
     Review findByIdAndUserId(Long id, Long userId);
+
+    List<Review> findByUserId(Long userId);
 }
