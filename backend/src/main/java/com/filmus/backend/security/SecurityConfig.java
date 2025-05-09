@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,13 +29,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 보안 취약 탐색 방지용: 민감 파일 요청은 차단
+                        // 민감한 경로 차단 (에러 발생하지 않도록 정확한 경로로 작성)
                         .requestMatchers(
-                                "/**/*.env", "/**/.env", "/**/.env.*", "/**/config.*",
-                                "/**/phpinfo.php", "/**/server-info*", "/**/wp-config*", "/**/aws*"
+                                "/.env", "/.env.*", "/config.*",
+                                "/phpinfo.php", "/server-info", "/wp-config", "/aws"
                         ).denyAll()
 
                         // 인증이 필요한 경로
@@ -43,15 +44,16 @@ public class SecurityConfig {
                         // 인증 없이 허용되는 경로
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        // 그 외는 모두 허용
+                        // 나머지는 모두 허용
                         .anyRequest().permitAll()
                 )
                 .headers(headers -> headers
-                        .addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
+                        .addHeaderWriter(new XFrameOptionsHeaderWriter(
+                                XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(form -> form.disable())
-                .httpBasic(httpBasic -> httpBasic.disable());
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
