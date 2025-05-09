@@ -9,23 +9,30 @@ import com.filmus.backend.movie.dto.SearchRequestDTO;
 import com.filmus.backend.movie.dto.SearchResponseDTO;
 import com.filmus.backend.movie.entity.Movie;
 import com.filmus.backend.movie.repository.MovieRepository;
+import com.filmus.backend.movie.repository.MovieSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MovieService {
 
+    private static final int PAGE_SIZE = 30;
     private final WebClient webClient;
     private final MovieRepository movieRepository;
 
@@ -39,18 +46,51 @@ public class MovieService {
      */
     public SearchResponseDTO search(SearchRequestDTO req) {
         try {
-            String response = webClient.get()
-                    .uri(uriBuilder -> buildUri(uriBuilder, req, 50,
-                            (req.page() != null && req.page() > 0) ? (req.page() - 1) * 50 : 0))
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .blockOptional()
-                    .orElseThrow(() -> new CustomException(ErrorCode.KMDB_NO_RESPONSE));
+            int pageIndex = (req.page() != null && req.page() > 0) ? req.page() - 1 : 0;
 
-            return processSearchResponse(response);
+            PageRequest pageRequest =
+                    PageRequest.of(pageIndex, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "prodYear", "id"));
+
+            Page<Movie> page = movieRepository.findAll(
+                    MovieSpecification.of(req), pageRequest);
+
+            return new SearchResponseDTO(
+                    (int) page.getTotalElements(),
+                    page.getContent().stream()
+                            .map(this::toSimpleDTO)
+                            .collect(Collectors.toList())
+            );
+
         } catch (Exception e) {
+            // 로그를 남기고 세부 에러를 래핑
             throw new CustomException(ErrorCode.KMDB_SEARCH_FAILED);
         }
+
+
+//        try {
+//            String response = webClient.get()
+//                    .uri(uriBuilder -> buildUri(uriBuilder, req, 50,
+//                            (req.page() != null && req.page() > 0) ? (req.page() - 1) * 50 : 0))
+//                    .retrieve()
+//                    .bodyToMono(String.class)
+//                    .blockOptional()
+//                    .orElseThrow(() -> new CustomException(ErrorCode.KMDB_NO_RESPONSE));
+//
+//            return processSearchResponse(response);
+//        } catch (Exception e) {
+//            throw new CustomException(ErrorCode.KMDB_SEARCH_FAILED);
+//        }
+    }
+
+    /* ---------- Entity → DTO 변환 ---------- */
+    private SearchResponseDTO.MovieSimpleDTO toSimpleDTO(Movie m) {
+        return new SearchResponseDTO.MovieSimpleDTO(
+                m.getMovieId(),
+                m.getMovieSeq(),
+                m.getTitle(),
+                m.getProdYear(),
+                m.getPosterUrl()
+        );
     }
 
     /**
