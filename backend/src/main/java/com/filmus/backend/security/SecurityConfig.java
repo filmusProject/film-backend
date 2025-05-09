@@ -31,8 +31,19 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        // 보안 취약 탐색 방지용: 민감 파일 요청은 차단
+                        .requestMatchers(
+                                "/**/*.env", "/**/.env", "/**/.env.*", "/**/config.*",
+                                "/**/phpinfo.php", "/**/server-info*", "/**/wp-config*", "/**/aws*"
+                        ).denyAll()
+
+                        // 인증이 필요한 경로
                         .requestMatchers("/api/protected/**").authenticated()
+
+                        // 인증 없이 허용되는 경로
+                        .requestMatchers("/api/auth/**").permitAll()
+
+                        // 그 외는 모두 허용
                         .anyRequest().permitAll()
                 )
                 .headers(headers -> headers
