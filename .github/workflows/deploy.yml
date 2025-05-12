@@ -43,7 +43,7 @@ jobs:
     - name: Build & Push
       run: |
         IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
-        docker build -f backend/Dockerfile -t $IMAGE_URI .
+        docker build -f backend/Dockerfile -t $IMAGE_URI backend
         docker push $IMAGE_URI
 
     # 5) EC2 배포
