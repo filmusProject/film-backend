@@ -74,4 +74,15 @@ public class MovieSpecification {
                              jakarta.persistence.criteria.Path<String> path, String value) {
         if (StringUtils.hasText(value)) list.add(cb.like(path, "%" + value.trim() + "%"));
     }
+
+    public static Specification<Movie> plotKeywordsContainsAny(List<String> keywords) {
+        return (root, query, cb) -> {
+            List<Predicate> ors = new ArrayList<>();
+            for (String kw : keywords) {
+                ors.add(cb.like(root.get("plotKeywords"), "%" + kw + "%"));
+            }
+            return cb.or(ors.toArray(new Predicate[0]));
+        };
+    }
+
 }

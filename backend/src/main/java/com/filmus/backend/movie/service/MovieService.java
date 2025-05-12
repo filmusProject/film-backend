@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.filmus.backend.common.exception.CustomException;
 import com.filmus.backend.common.exception.ErrorCode;
-import com.filmus.backend.movie.dto.MovieDTO;
-import com.filmus.backend.movie.dto.SearchRequestDTO;
-import com.filmus.backend.movie.dto.SearchResponseDTO;
+import com.filmus.backend.movie.dto.*;
 import com.filmus.backend.movie.entity.Movie;
+import com.filmus.backend.movie.external.NlpClient;
 import com.filmus.backend.movie.repository.MovieRepository;
 import com.filmus.backend.movie.repository.MovieSpecification;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,6 +32,7 @@ public class MovieService {
     private static final int PAGE_SIZE = 30;
     private final WebClient webClient;
     private final MovieRepository movieRepository;
+    private final NlpClient nlpClient;
 
     @Value("${kmdb.service-key}")
     private String serviceKey;
@@ -66,7 +64,7 @@ public class MovieService {
             throw new CustomException(ErrorCode.KMDB_SEARCH_FAILED);
         }
 
-
+//        레거시 코드 kmdb openAPI를 통해 가져오는 코드
 //        try {
 //            String response = webClient.get()
 //                    .uri(uriBuilder -> buildUri(uriBuilder, req, 50,
@@ -114,6 +112,54 @@ public class MovieService {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.MOVIE_DETAIL_FAILED);
         }
+    }
+
+    public PlotSearchResponseDTO searchByPlotDescription(String description, int limit) {
+
+        /* 1) NLP 서버 호출 */
+        var nlpRes = nlpClient.extractKeywords(description);
+
+        /* 2) 키워드 리스트 (중복 제거) */
+        List<String> keywords = nlpRes.extracted_keywords().stream()
+                .map(NlpKeywordResponseDTO.ExtractedKeyword::keyword)
+                .map(String::trim)
+                .distinct()
+                .toList();
+
+        if (keywords.isEmpty()) {
+            return new PlotSearchResponseDTO(nlpRes.extracted_keywords(), nlpRes.summary(), List.of());
+        }
+
+        /* 3) 후보 영화 조회 */
+        List<Movie> candidates = movieRepository.findAll(
+                MovieSpecification.plotKeywordsContainsAny(keywords)
+        );
+
+        /* 4) 유사도 계산 및 정렬 */
+        List<MovieMatchDTO> matches = candidates.stream()
+                .map(m -> {
+                    Set<String> movieKw = Arrays.stream(m.getPlotKeywords().split("\\s*,\\s*"))
+                            .collect(Collectors.toSet());
+
+                    List<String> common = keywords.stream()
+                            .filter(movieKw::contains)
+                            .toList();
+
+                    return new MovieMatchDTO(
+                            m.getId(),
+                            m.getMovieSeq(),
+                            m.getTitle(),
+                            m.getProdYear(),
+                            m.getPosterUrl(),
+                            common
+                    );
+                })
+                .filter(mm -> !mm.matchedKeywords().isEmpty())
+                .sorted(Comparator.comparingInt((MovieMatchDTO mm) -> mm.matchedKeywords().size()).reversed())
+                .limit(limit)
+                .toList();
+
+        return new PlotSearchResponseDTO(nlpRes.extracted_keywords(), nlpRes.summary(), matches);
     }
 
     /**
