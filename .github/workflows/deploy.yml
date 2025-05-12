@@ -23,7 +23,9 @@ jobs:
 
     # 1) Spring JAR 빌드
     - name: Build JAR
-      run: ./gradlew -p backend bootJar --no-daemon
+      run: |
+        chmod +x backend/gradlew          # 실행권한 보증
+        ./backend/gradlew -p backend bootJar --no-daemon
 
     # 2) AWS 인증
     - uses: aws-actions/configure-aws-credentials@v4
