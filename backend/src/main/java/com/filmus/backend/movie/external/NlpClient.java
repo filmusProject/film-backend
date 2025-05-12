@@ -21,7 +21,7 @@ public class NlpClient {
 
     /** ❶ 커넥션 풀 + 넉넉한 타임아웃 + 재시도 */
     private final WebClient webClient = WebClient.builder()
-            .baseUrl("http://localhost:5001")
+            .baseUrl("http://nlp:5001")
             .clientConnector(new ReactorClientHttpConnector(
                     HttpClient.create(ConnectionProvider.builder("nlpPool")
                                     .maxConnections(30)           // 동시 30커넥션
