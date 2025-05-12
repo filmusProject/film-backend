@@ -34,6 +34,11 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region:            ${{ env.AWS_REGION }}
 
+    - name: Build JAR
+      run: |
+        chmod +x backend/gradlew
+        ./backend/gradlew -p backend clean bootJar --no-daemon
+
     # 3) ECR 로그인
     - name: Login to ECR
       run: |
