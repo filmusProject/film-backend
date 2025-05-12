@@ -1,4 +1,4 @@
-name: Build Backend & Push to ECR
+name: Build Backend & Deploy
 
 on:
   push:
@@ -10,31 +10,56 @@ env:
   ECR_REPO: filmus-backend
   IMAGE_TAG: latest
 
+  EC2_HOST: ${{ secrets.EC2_HOST }}
+  EC2_USER: ubuntu
+  APP_DIR: /home/ubuntu/deploy
+
 jobs:
-  build-and-push:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Build JAR
-        run: ./gradlew bootJar --no-daemon
+    # 1) Spring JAR 빌드
+    - name: Build JAR
+      run: ./gradlew -p backend bootJar --no-daemon
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ env.AWS_REGION }}
+    # 2) AWS 인증
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region:            ${{ env.AWS_REGION }}
 
-      - name: Login to ECR
-        run: |
-          aws ecr get-login-password --region $AWS_REGION | \
-          docker login --username AWS --password-stdin \
-            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+    # 3) ECR 로그인
+    - name: Login to ECR
+      run: |
+        aws ecr get-login-password --region $AWS_REGION | \
+        docker login --username AWS --password-stdin \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      - name: Build & Push to ECR
-        run: |
-          IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
-          docker build -f backend/Dockerfile -t $IMAGE_URI .
-          docker push $IMAGE_URI
+    # 4) 이미지 빌드·푸시
+    - name: Build & Push
+      run: |
+        IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+        docker build -f backend/Dockerfile -t $IMAGE_URI .
+        docker push $IMAGE_URI
+
+    # 5) EC2 배포
+    - name: Deploy to EC2
+      env:
+        SSH_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
+
+        ssh $EC2_USER@$EC2_HOST << EOF
+          set -euo pipefail
+          echo "🛰  Pulling latest Backend image"
+          cd $APP_DIR
+          docker compose pull backend
+          docker compose up -d backend
+        EOF
