@@ -12,7 +12,7 @@ env:
 
   EC2_HOST: ${{ secrets.EC2_HOST }}
   EC2_USER: ubuntu
-  APP_DIR: /home/ubuntu/deploy
+  APP_DIR: /home/ubuntu
 
 jobs:
   build-and-deploy:
