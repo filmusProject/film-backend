@@ -35,7 +35,7 @@ public class Movie {
     @Column(length = 1000)
     private String titleEtc;
 
-    @Column(length = 500)
+    @Column(length = 1000)
     private String directorNm;
 
     @Column(columnDefinition = "TEXT")
@@ -108,4 +108,7 @@ public class Movie {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(columnDefinition = "TEXT")
+    private String plotKeywords;
 }

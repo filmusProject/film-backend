@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -107,6 +108,12 @@ public class AuthController {
         boolean sent = findUsernameService.sendUsernameToEmail(email);
         return sent ? ResponseEntity.ok("입력한 이메일로 아이디를 전송했습니다.")
                 : ResponseEntity.badRequest().body("해당 이메일로 등록된 사용자가 없습니다.");
+    }
+
+    @PostMapping("/admin/signup")
+    @PreAuthorize("hasRole('ADMIN')") // Spring Security 설정 필요
+    public void adminSignup(@RequestBody @Valid SignupRequestDto request) {
+        authService.adminSignup(request);
     }
 
 

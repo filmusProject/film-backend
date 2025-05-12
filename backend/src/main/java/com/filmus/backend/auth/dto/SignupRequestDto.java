@@ -37,4 +37,7 @@ public class SignupRequestDto {
 
     @Schema(description = "생년월일 (선택 입력, yyyy-MM-dd 형식)", example = "1998-07-21")
     private String birthDate;
+
+    @Schema(description = "권한 (생략 시 기본 ROLE_USER, ADMIN은 별도 API 사용)", example = "ROLE_USER")
+    private String role;
 }
