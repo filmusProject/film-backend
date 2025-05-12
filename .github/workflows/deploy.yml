@@ -1,51 +1,40 @@
-name: Deploy to EC2 (Docker on EC2 directly)
+name: Build Backend & Push to ECR
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
 
 env:
-  EC2_INSTANCE: 52.62.100.186
-  EC2_USER: ubuntu
-  SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
-  CONTAINER_NAME: filmus-backend-container
-  APP_DIR: /home/ubuntu/film-backend/backend
-  PORT: 8080
+  AWS_REGION: ap-northeast-2
+  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  ECR_REPO: filmus-backend
+  IMAGE_TAG: latest
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set up SSH Key
-      run: |
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+      - uses: actions/checkout@v4
 
-    - name: Deploy to EC2
-      run: |
-        ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $EC2_USER@$EC2_INSTANCE << EOF
-          echo "✅ EC2 접속 완료"
+      - name: Build JAR
+        run: ./gradlew bootJar --no-daemon
 
-          echo "📦 최신 코드 가져오기"
-          cd /home/ubuntu/film-backend
-          git reset --hard
-          git clean -fd
-          git pull origin master
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
 
-          echo "🛠 Spring Boot 빌드"
-          cd /home/ubuntu/film-backend/backend
-          chmod +x ./gradlew
-          ./gradlew clean build --no-daemon
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | \
+          docker login --username AWS --password-stdin \
+            $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-          echo "🐳 Docker 빌드 및 재시작"
-          docker stop $CONTAINER_NAME || true
-          docker rm $CONTAINER_NAME || true
-          docker build -t $CONTAINER_NAME .
-
-          docker run -d -p $PORT:8080 --name $CONTAINER_NAME $CONTAINER_NAME
-
-          echo "🚀 배포 완료"
-        EOF
+      - name: Build & Push to ECR
+        run: |
+          IMAGE_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+          docker build -f backend/Dockerfile -t $IMAGE_URI .
+          docker push $IMAGE_URI

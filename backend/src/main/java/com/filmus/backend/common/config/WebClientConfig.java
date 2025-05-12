@@ -25,4 +25,6 @@ public class WebClientConfig {
                         .maxInMemorySize(10 * 1024 * 1024)) // 10MB로 늘림
                 .build();
     }
+
+
 }

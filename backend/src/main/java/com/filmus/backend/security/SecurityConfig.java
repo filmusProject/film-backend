@@ -4,8 +4,8 @@ import com.filmus.backend.token.service.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,6 +20,7 @@ import java.util.Arrays;
 // 주석을 추가할 것
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -29,31 +30,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // 민감한 경로 차단 (에러 발생하지 않도록 정확한 경로로 작성)
-                        .requestMatchers(
-                                "/.env", "/.env.*", "/config.*",
-                                "/phpinfo.php", "/server-info", "/wp-config", "/aws"
-                        ).denyAll()
-
-                        // 인증이 필요한 경로
-                        .requestMatchers("/api/protected/**").authenticated()
-
-                        // 인증 없이 허용되는 경로
                         .requestMatchers("/api/auth/**").permitAll()
-
-                        // 나머지는 모두 허용
+                        .requestMatchers("/api/protected/**").authenticated()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")  // 👈 관리자 전용 경로 추가
                         .anyRequest().permitAll()
                 )
                 .headers(headers -> headers
-                        .addHeaderWriter(new XFrameOptionsHeaderWriter(
-                                XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
+                        .addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstractHttpConfigurer::disable);
+                .formLogin(form -> form.disable())
+                .httpBasic(httpBasic -> httpBasic.disable());
 
         return http.build();
     }
