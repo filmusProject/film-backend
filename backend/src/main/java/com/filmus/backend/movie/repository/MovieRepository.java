@@ -38,4 +38,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
 //                 ) > 0
 //           """)
 //    List<Movie> findByKeywordIntersection(Set<String> keywords);
+
+    // MovieRepository.java
+    List<Movie> findByGenreContaining(String genre);
 }
