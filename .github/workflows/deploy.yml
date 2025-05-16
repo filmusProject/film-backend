@@ -61,6 +61,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          debug: true
           script: |
             set -e
             export IMAGE_REPO=${{ env.IMAGE_REPO }}
