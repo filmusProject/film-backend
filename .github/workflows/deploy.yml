@@ -58,13 +58,17 @@ jobs:
       - name: SSH & deploy on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
+          host: ${{ secrets.EC2_HOST }}          # ← 비어 있으면 에러
+          username: ubuntu                       # Amazon Linux2 는 ec2-user
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          debug: true
+          port: 22                               # 필요 시 변경
+          timeout: 60s
           script: |
             set -e
+            echo "✅ 연결 성공, 배포 시작"
+
             export IMAGE_REPO=${{ env.IMAGE_REPO }}
+
             docker compose -f /srv/filmus/docker-compose.yml pull
             docker compose -f /srv/filmus/docker-compose.yml up -d --remove-orphans
             docker image prune -f --filter "until=24h"
