@@ -23,8 +23,11 @@ jobs:
           java-version: 21
           cache: gradle
 
+      # ───────── 여기 수정 ─────────
       - name: Test & build JAR
-        run: ./gradlew :backend:bootJar
+        run: ./gradlew bootJar
+        working-directory: backend   # ← wrapper 가 있는 디렉터리
+      # ────────────────────────────
 
       - name: Login to registry
         uses: docker/login-action@v3
