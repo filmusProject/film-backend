@@ -5,19 +5,8 @@ on:
     branches: [ master ]          # 배포 브랜치
 
 env:
-<<<<<<< HEAD
-  AWS_REGION: ap-southeast-2
-  AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-  ECR_REPO: filmus-backend
-  IMAGE_TAG: latest
-
-  EC2_HOST: ${{ secrets.EC2_HOST }}
-  EC2_USER: ubuntu
-  APP_DIR: /home/ubuntu/app
-=======
   IMAGE_REPO: ghcr.io/taco-recipe/filmus-backend   # 또는 ECR, Docker Hub
   DOCKER_BUILDKIT: 1
->>>>>>> 7c5ee70 (feat : movie nlp search에서 nlp 서버 컨트롤을 추가)
 
 jobs:
   build-and-push:
@@ -37,26 +26,12 @@ jobs:
       - name: Test & build JAR
         run: ./gradlew :backend:bootJar
 
-<<<<<<< HEAD
-    - name: Build JAR
-      run: |
-        chmod +x backend/gradlew
-        ./backend/gradlew -p backend clean bootJar --no-daemon
-
-    # 3) ECR 로그인
-    - name: Login to ECR
-      run: |
-        aws ecr get-login-password --region $AWS_REGION | \
-        docker login --username AWS --password-stdin \
-          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-=======
       - name: Login to registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_TOKEN }}   # repo → Settings → Secrets
->>>>>>> 7c5ee70 (feat : movie nlp search에서 nlp 서버 컨트롤을 추가)
 
       - name: Build image
         run: |
