@@ -1,0 +1,65 @@
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: file:/app/config/keystore.p12
+    key-store-password: password
+    key-store-type: PKCS12
+    key-alias: filmus-ssl
+
+spring:
+  profiles:
+    active: docker
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: jisung494@gmail.com
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
+kmdb:
+  base-url: http://api.koreafilm.or.kr
+  service-key: 8Z02968DPIVWH3GL5FBO
+
+jwt:
+  secret: D8R+tNK,x6`AZ:s&h;3g_}-XQ=4m!.fV
+
+aws:
+  enabled: true
+  region: ap-northeast-2
+  nlp-instance-id: ${NLP_INSTANCE_ID}
+  startTimeoutSec: 120
+  stopDelayMin: 30
+
+nlp:
+  baseUrl: ${NLP_BASEURL}

@@ -1,0 +1,66 @@
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: file:/app/config/keystore.p12  # 도커 내 파일 경로에 맞게 수정
+    key-store-password: password
+    key-store-type: PKCS12
+    key-alias: filmus-ssl
+spring:
+  profiles:
+    active: master  # 현재 활성화할 환경을 'master'로 설정 (추후 prod 등 다른 환경을 추가 가능)
+
+  datasource:
+    url: jdbc:mysql://database-1.cr0qmoquie7x.ap-southeast-2.rds.amazonaws.com:3306/filmus_db?useSSL=false&serverTimezone=Asia/Seoul
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root  # 기본 사용자명
+    password: vlffmadjtm1!
+
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect  # ✅ MySQL용 Hibernate Dialect
+    hibernate:
+      ddl-auto: update  # 개발 중에는 update, 운영 시에는 validate 권장
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+
+  mail:
+    host: smtp.gmail.com  # Gmail SMTP 서버
+    port: 587  # TLS 포트
+    username: jisung494@gmail.com  # Gmail 주소 (발신자)
+    password: ${MAIL_PASSWORD}  # 앱 비밀번호 (Gmail 설정에서 생성한 전용 비밀번호)
+    properties:
+      mail:
+        smtp:
+          auth: true  # 인증 필요
+          starttls:
+            enable: true  # TLS 사용
+
+springdoc:
+  api-docs:
+    enabled: true  # Swagger API 문서 활성화
+    path: /v3/api-docs  # API 문서의 기본 경로 (http://localhost:8080/v3/api-docs)
+  swagger-ui:
+    path: /swagger-ui.html  # Swagger UI 접속 경로 (http://localhost:8080/swagger-ui.html)
+    operationsSorter: method  # API 목록을 HTTP 메서드(GET, POST 등) 기준으로 정렬
+    tagsSorter: alpha  # API 태그를 알파벳 순으로 정렬
+
+kmdb:
+  base-url: http://api.koreafilm.or.kr
+  service-key: ${KMDB_SERVICE_KEY}8Z02968DPIVWH3GL5FBO
+
+
+jwt:
+  secret: D8R+tNK,x6`AZ:s&h;3g_}-XQ=4m!.fV
+
+aws:
+  enabled: true
+  region: ap-southeast-2          # NLP 인스턴스 리전
+  nlp-instance-id: ${NLP_INSTANCE_ID}
+  startTimeoutSec: 120
+  stopDelayMin: 30                # 마지막 호출 후 30분 뒤 OFF
+
+nlp:
+  baseUrl: http://<elastic-ip>:5001

@@ -13,6 +13,7 @@ java {
 	}
 }
 
+
 bootJar {
 	archiveFileName = "filmus-backend.jar"
 }
@@ -62,10 +63,24 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	//batch
-	implementation("org.springframework.boot:spring-boot-starter-batch")
+	/* ───────── AWS SDK v2 ──────────
+       BOM(버전 일괄 관리) → implementation 의존엔 버전 명시 안 함 */
+	implementation platform('software.amazon.awssdk:bom:2.25.62')
+	implementation 'software.amazon.awssdk:ec2'
+	// optional – SSM or STS 도 필요하면 추가
+	// implementation 'software.amazon.awssdk:ssm'
+
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+
+	implementation 'org.hibernate.validator:hibernate-validator'
+
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
 }
