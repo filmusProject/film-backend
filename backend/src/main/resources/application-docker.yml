@@ -7,9 +7,6 @@ server:
     key-store-type: PKCS12
     key-alias: filmus-ssl
 
-spring:
-  profiles:
-    active: docker
 
   datasource:
     url: ${SPRING_DATASOURCE_URL}
@@ -49,10 +46,10 @@ springdoc:
 
 kmdb:
   base-url: http://api.koreafilm.or.kr
-  service-key: 8Z02968DPIVWH3GL5FBO
+  service-key: ${KMDB_SERVICE_KEY}
 
 jwt:
-  secret: D8R+tNK,x6`AZ:s&h;3g_}-XQ=4m!.fV
+  secret: ${JWT_SECRET}
 
 aws:
   enabled: true
