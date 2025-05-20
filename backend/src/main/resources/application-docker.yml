@@ -1,5 +1,5 @@
 server:
-  port: 8443
+  port: 8080
   ssl:
     enabled: false
     key-store: file:/app/config/keystore.p12
