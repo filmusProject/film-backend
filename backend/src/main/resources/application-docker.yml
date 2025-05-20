@@ -1,11 +1,6 @@
 server:
   port: 8443
-  ssl:
-    enabled: true
-    key-store: file:/app/config/keystore.p12
-    key-store-password: password
-    key-store-type: PKCS12
-    key-alias: filmus-ssl
+  forward-headers-strategy: native
 
 spring:
   datasource:
