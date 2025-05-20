@@ -1,0 +1,52 @@
+package com.filmus.backend.recommend.weather.client;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+
+/**
+ * OpenWeatherMap의 현재 날씨 API(/data/2.5/weather)를 호출하여
+ * 현재 날씨 상태(main)를 조회하는 클라이언트
+ */
+@Component
+@Slf4j
+public class WeatherClient {
+
+    @Value("${weather.api.url}")  // https://api.openweathermap.org/data/2.5/weather
+    private String apiUrl;
+
+    @Value("${weather.api.key}")
+    private String apiKey;
+
+    private final WebClient webClient = WebClient.create();
+
+    /**
+     * 위도와 경도를 기반으로 현재 날씨 상태(main)를 조회한다.
+     *
+     * @param lat 위도
+     * @param lon 경도
+     * @return 날씨 상태(main) 문자열 (예: Clear, Rain)
+     */
+    public String getCurrentWeatherMainByLatLon(double lat, double lon) {
+        try {
+            String uri = String.format(
+                    "%s?lat=%f&lon=%f&units=metric&appid=%s",
+                    apiUrl, lat, lon, apiKey
+            );
+
+            log.info("[날씨 API 호출] {}", uri);
+
+            OpenWeatherResponse response = webClient.get()
+                    .uri(uri)
+                    .retrieve()
+                    .bodyToMono(OpenWeatherResponse.class)
+                    .block();
+
+            return response.getWeather().get(0).getMain();  // weather[0].main
+        } catch (Exception e) {
+            log.error("날씨 API 호출 실패: {}", e.getMessage());
+            return "Clear";  // 실패 시 fallback
+        }
+    }
+}
