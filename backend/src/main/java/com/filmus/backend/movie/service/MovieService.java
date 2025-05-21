@@ -145,7 +145,7 @@ public class MovieService {
                             .toList();
 
                     return new MovieMatchDTO(
-                            m.getId(),
+                            m.getMovieId(),
                             m.getMovieSeq(),
                             m.getTitle(),
                             m.getProdYear(),
