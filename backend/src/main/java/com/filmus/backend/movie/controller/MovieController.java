@@ -5,16 +5,8 @@ import com.filmus.backend.movie.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.JobParameters;
-import org.springframework.batch.core.JobParametersBuilder;
-import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 
 @Tag(name = "영화 API", description = "KMDb 영화 검색 및 상세 정보 조회 API")
@@ -24,8 +16,6 @@ import java.util.List;
 public class MovieController {
 
     private final MovieService movieService;
-    private final JobLauncher jobLauncher;
-    private final Job nlpKeywordJob;
 
     @Operation(
             summary = "영화 검색 API",
@@ -55,22 +45,4 @@ public class MovieController {
         return ResponseEntity.ok(result);
     }
 
-    @Operation(
-            summary = "NLP 키워드 배치 실행",
-            description = "전체 영화 데이터를 대상으로 plot 필드에 기반해 NLP 분석을 수행하고, 결과를 plot_keywords 컬럼에 저장합니다."
-    )
-    @PostMapping("/nlp/batch")
-    public ResponseEntity<String> runNlpKeywordBatch() {
-        try {
-            JobParameters params = new JobParametersBuilder()
-                    .addLong("time", System.currentTimeMillis())
-                    .toJobParameters();
-
-            JobExecution execution = jobLauncher.run(nlpKeywordJob, params);
-            return ResponseEntity.ok("Batch job started: " + execution.getStatus());
-
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Batch job failed: " + e.getMessage());
-        }
-    }
 }

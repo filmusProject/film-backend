@@ -13,6 +13,7 @@ java {
 	}
 }
 
+
 bootJar {
 	archiveFileName = "filmus-backend.jar"
 }
@@ -62,10 +63,18 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	//batch
-	implementation("org.springframework.boot:spring-boot-starter-batch")
+
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
+
+	implementation 'org.hibernate.validator:hibernate-validator'
+
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+	options.encoding = 'UTF-8'
 }

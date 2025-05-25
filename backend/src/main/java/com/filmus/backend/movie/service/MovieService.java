@@ -16,7 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -146,7 +145,7 @@ public class MovieService {
                             .toList();
 
                     return new MovieMatchDTO(
-                            m.getId(),
+                            m.getMovieId(),
                             m.getMovieSeq(),
                             m.getTitle(),
                             m.getProdYear(),
