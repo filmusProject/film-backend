@@ -18,56 +18,62 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FixedRecommendationService {
 
-    // 원본 영화 후보 조회용 리포지토리 (기존 movies 테이블)
     private final MovieQueryRepository movieQueryRepository;
-
-    // 추천 결과 저장 및 조회용 리포지토리 (recommended_movies 테이블)
     private final FixedRecommendedMovieRepository fixedRecommendedMovieRepository;
 
-    // 매일 자정 실행될 추천 생성 및 저장 메서드
+    /**
+     * 오늘 날짜의 고정 추천 영화 30개(카테고리별 10개)를 생성한다.
+     */
     @Transactional
     public void saveDailyRecommendations() {
-        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul")); // MySQL과 java의 시간대가 어긋날 수 있음을 방지
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
-        // 추천 카테고리 정의 (고정)
+        //  기존 추천 전체 삭제 (장르별 삭제가 아닌 전체 삭제)
+        fixedRecommendedMovieRepository.deleteAll();
+
+        // 추천할 고정 카테고리 맵
         Map<String, String> categoryMap = Map.of(
                 "action", "액션",
                 "romance", "로맨스",
                 "anime", "애니"
         );
 
-        // 각 카테고리별로 추천 생성
-        categoryMap.forEach((key, keyword) -> {
-            // 1. 기존 추천 삭제 (해당 날짜+장르)
-            fixedRecommendedMovieRepository.deleteAll(); // 모든 추천 싹 삭제
+        //  장르별로 각각 10개씩 추천 생성 → 총 30개
+        for (Map.Entry<String, String> entry : categoryMap.entrySet()) {
+            String genreKey = entry.getKey();       // 예: action
+            String genreKeyword = entry.getValue(); // 예: 액션
 
-            // 2. 원본 영화 테이블에서 장르 포함 영화 조회
-            List<Movie> candidates = movieQueryRepository.findMoviesByGenreKeyword(keyword);
+            // 장르 키워드 포함된 영화 후보 조회
+            List<Movie> candidates = movieQueryRepository.findMoviesByGenreKeyword(genreKeyword);
+            Collections.shuffle(candidates); // 랜덤 섞기
 
-            // 3. 랜덤 셔플 후 10개 선택
-            Collections.shuffle(candidates);
-            List<Movie> top10 = candidates.stream().limit(10).toList();
+            List<Movie> top10 = candidates.stream()
+                    .limit(10)
+                    .toList();
 
-            // 4. 추천 테이블에 저장 (RecommendedMovie 엔티티 생성)
-            top10.forEach(movie -> {
+            // 각 영화에 대해 추천 엔티티 생성
+            for (Movie movie : top10) {
                 FixedRecommendedMovie recommended = FixedRecommendedMovie.builder()
                         .movieId(movie.getMovieId())
                         .movieSeq(movie.getMovieSeq())
                         .title(movie.getTitle())
-                        .prodyear(movie.getProdYear())
+                        .year(movie.getProdYear() != null ? movie.getProdYear() : "미상")
                         .genre(movie.getGenre())
                         .posterUrl(movie.getPosterUrl())
                         .recommendedDate(today)
                         .build();
 
                 fixedRecommendedMovieRepository.save(recommended);
-            });
-        });
+            }
+        }
     }
 
-    // 오늘 날짜의 추천 조회
+    /**
+     * 오늘 날짜의 추천 결과를 카테고리별로 조회한다.
+     * @return Map<카테고리명, 추천 DTO 리스트>
+     */
     public Map<String, List<FixedRecommendedMovieDto>> getTodayRecommendations() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
         Map<String, String> categoryMap = Map.of(
                 "action", "액션",
@@ -77,25 +83,32 @@ public class FixedRecommendationService {
 
         Map<String, List<FixedRecommendedMovieDto>> result = new HashMap<>();
 
-        categoryMap.forEach((key, keyword) -> {
-            List<FixedRecommendedMovie> movies = fixedRecommendedMovieRepository
-                    .findByRecommendedDateAndGenreContaining(today, keyword);
+        for (Map.Entry<String, String> entry : categoryMap.entrySet()) {
+            String categoryKey = entry.getKey();       // 예: action
+            String genreKeyword = entry.getValue();    // 예: 액션
 
-            result.put(key, movies.stream()
+            List<FixedRecommendedMovie> movies = fixedRecommendedMovieRepository
+                    .findByRecommendedDateAndGenreContaining(today, genreKeyword);
+
+            List<FixedRecommendedMovieDto> dtos = movies.stream()
                     .map(this::convertToDto)
-                    .collect(Collectors.toList()));
-        });
+                    .collect(Collectors.toList());
+
+            result.put(categoryKey, dtos);
+        }
 
         return result;
     }
 
-    // 엔티티 → DTO 변환 메서드
+    /**
+     * 엔티티를 DTO로 변환
+     */
     private FixedRecommendedMovieDto convertToDto(FixedRecommendedMovie movie) {
         return FixedRecommendedMovieDto.builder()
                 .movieId(movie.getMovieId())
                 .movieSeq(movie.getMovieSeq())
                 .title(movie.getTitle())
-                .prodyear(movie.getProdyear())
+                .year(movie.getYear())
                 .genre(movie.getGenre())
                 .posterUrl(movie.getPosterUrl())
                 .build();

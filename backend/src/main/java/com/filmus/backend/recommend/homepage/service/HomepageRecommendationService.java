@@ -47,7 +47,7 @@ public class HomepageRecommendationService {
                         .build();
             }
             case "award" -> {
-                // 수상 추천 (전체 리스트 중 무작위 5개)
+                // 수상 추천 (전체 리스트 중 무작위 10개)
                 List<AwardRecommendedMovieDto> award = awardRecommendationService.getAwardRecommendations();
                 Collections.shuffle(award);
                 return HomepageRecommendationDto.builder()
