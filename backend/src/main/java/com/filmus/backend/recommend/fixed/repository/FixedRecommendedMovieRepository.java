@@ -14,7 +14,5 @@ public interface FixedRecommendedMovieRepository extends JpaRepository<FixedReco
     // 오늘 날짜의 추천 영화 조회
     List<FixedRecommendedMovie> findByRecommendedDateAndGenreContaining(LocalDate date, String genre);
 
-    // 특정 날짜와 장르 키워드가 포함된 추천 영화 삭제
-    void deleteByRecommendedDateAndGenreContaining(LocalDate date, String genre);
 }
 

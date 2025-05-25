@@ -1,6 +1,7 @@
 package com.filmus.backend.recommend.fixed.scheduler;
 
 import com.filmus.backend.recommend.fixed.service.FixedRecommendationService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 public class FixedRecommendationScheduler {
 
     private final FixedRecommendationService recommendService;
+
+
 
     // 매일 자정 00:00:00에 실행
     @Scheduled(cron = "0 0 0 * * *")
