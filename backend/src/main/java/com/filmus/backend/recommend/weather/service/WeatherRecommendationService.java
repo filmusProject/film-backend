@@ -29,7 +29,7 @@ public class WeatherRecommendationService {
     private final WeatherMovieQueryRepository weatherMovieQueryRepository;
 
     private static final int DB_FETCH_LIMIT = 500;
-    private static final int RECOMMEND_LIMIT = 20;
+    private static final int RECOMMEND_LIMIT = 10;
 
 
     /**

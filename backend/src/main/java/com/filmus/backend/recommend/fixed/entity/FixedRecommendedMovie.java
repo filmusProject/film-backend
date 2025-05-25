@@ -19,7 +19,7 @@ public class FixedRecommendedMovie {
     private String movieId; // KMDB 영화 ID
     private String movieSeq; // KMDB 영화 일련번호
     private String title; // 영화 제목
-    private String prodyear; // 제작 연도
+    private String year; // 제작 연도
     private String genre; // 장르 문자열 (예: 액션,드라마)
     private String posterUrl; // 포스터 이미지 URL
     private LocalDate recommendedDate; // 추천 날짜

@@ -4,34 +4,45 @@ package com.filmus.backend.recommend.award.dto;
 
 import com.filmus.backend.recommend.award.entity.AwardRecommendedMovie;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
+@Schema(description = "수상내역 기반 추천 영화 응답 DTO")
 @Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class AwardRecommendedMovieDto {
 
-    @Schema(description = "KMDB 영화 ID(PK)", example = "01")
-    private final Long movieId;       // 영화 ID
+    @Schema(description = "KMDB 영화 ID", example = "F")
+    private String movieId;
+
+    @Schema(description = "KMDB 영화 일련번호", example = "0001")
+    private String movieSeq;
 
     @Schema(description = "영화 제목", example = "인셉션")
-    private final String title;       // 영화 제목
+    private String title;
+
+    @Schema(description = "개봉 연도", example = "2010")
+    private String year;
+
+    @Schema(description = "장르", example = "액션, SF")
+    private String genre;
 
     @Schema(description = "포스터 URL", example = "http://...")
-    private final String posterUrl;   // 영화 포스터 URL
+    private String posterUrl;
 
-    @Builder
-    public AwardRecommendedMovieDto(Long movieId, String title, String posterUrl) {
-        this.movieId = movieId;
-        this.title = title;
-        this.posterUrl = posterUrl;
-    }
 
-    // Entity → DTO 변환 메서드
-    public static AwardRecommendedMovieDto from(AwardRecommendedMovie entity) {
+    public static AwardRecommendedMovieDto from(AwardRecommendedMovie movie) {
         return AwardRecommendedMovieDto.builder()
-                .movieId(entity.getMovie().getId())
-                .title(entity.getMovie().getTitle())
-                .posterUrl(entity.getMovie().getPosterUrl())
+                .movieId(movie.getMovieId())
+                .movieSeq(movie.getMovieSeq())
+                .title(movie.getTitle())
+                .year(movie.getYear())
+                .genre(movie.getGenre())
+                .posterUrl(movie.getPosterUrl())
                 .build();
     }
+
+
 }
