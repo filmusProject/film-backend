@@ -53,4 +53,12 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public boolean isAdmin() {
+        return "ROLE_ADMIN".equals(user.getRole());
+    }
+
+    public Long getUserId(){
+        return user.getId();
+    }
 }

@@ -1,15 +1,12 @@
 package com.filmus.backend.movie.controller;
 
-import com.filmus.backend.movie.dto.MovieDTO;
-import com.filmus.backend.movie.dto.SearchRequestDTO;
-import com.filmus.backend.movie.dto.SearchResponseDTO;
+import com.filmus.backend.movie.dto.*;
 import com.filmus.backend.movie.service.MovieService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
-
 
 
 @Tag(name = "영화 API", description = "KMDb 영화 검색 및 상세 정보 조회 API")
@@ -36,4 +33,16 @@ public class MovieController {
     )
     @GetMapping(value = "/detail")
     public MovieDTO detail(@RequestParam String movieId, @RequestParam String movieSeq) {return movieService.detail(movieId,movieSeq);}
+
+    /** 🔍 줄거리 설명으로 유사 영화 검색 */
+    @Operation(
+            summary = "줄거리 기반 유사 영화 검색",
+            description = "입력된 줄거리(description)를 기반으로 NLP 분석 후 유사한 키워드를 가진 영화를 반환합니다."
+    )
+    @PostMapping("/nlp/search")
+    public ResponseEntity<PlotSearchResponseDTO> searchPlot(@RequestBody NlpKeywordRequestDTO request) {
+        var result = movieService.searchByPlotDescription(request.description(), 30);
+        return ResponseEntity.ok(result);
+    }
+
 }
