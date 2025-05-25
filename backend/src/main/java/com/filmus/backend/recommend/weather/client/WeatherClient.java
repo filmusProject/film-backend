@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class WeatherClient {
 
-    @Value("${weather.api.url}")  // https://api.openweathermap.org/data/2.5/weather
+    @Value("${weather.api.url}")
     private String apiUrl;
 
     @Value("${weather.api.key}")
@@ -21,18 +21,19 @@ public class WeatherClient {
 
     private final WebClient webClient = WebClient.create();
 
+    private static final double SEOUL_LAT = 37.5665;
+    private static final double SEOUL_LON = 126.9780;
     /**
      * 위도와 경도를 기반으로 현재 날씨 상태(main)를 조회한다.
      *
-     * @param lat 위도
-     * @param lon 경도
+
      * @return 날씨 상태(main) 문자열 (예: Clear, Rain)
      */
-    public String getCurrentWeatherMainByLatLon(double lat, double lon) {
+    public String getCurrentWeatherMainByLatLon() {
         try {
             String uri = String.format(
                     "%s?lat=%f&lon=%f&units=metric&appid=%s",
-                    apiUrl, lat, lon, apiKey
+                    apiUrl, SEOUL_LAT, SEOUL_LON, apiKey
             );
 
             log.info("[날씨 API 호출] {}", uri);
