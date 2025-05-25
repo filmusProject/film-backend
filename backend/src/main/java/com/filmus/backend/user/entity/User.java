@@ -49,6 +49,10 @@ public class User {
     @Column(name = "is_verified")
     private boolean isVerified = false; // 이메일 인증 여부 (기본 false)
 
+    @Setter
+    @Column(nullable = false, length = 20)
+    private String role = "ROLE_USER"; // 기본 ROLE_USER
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt; // 생성 시각
