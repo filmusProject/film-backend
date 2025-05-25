@@ -38,3 +38,6 @@ out/
 
 # Ignore application.yml to prevent exposing secrets
 /src/main/resources/application.yml
+
+# IntelliJ project files
+*.iml
