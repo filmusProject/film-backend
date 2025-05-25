@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class FixedRecommendationService {
     // 매일 자정 실행될 추천 생성 및 저장 메서드
     @Transactional
     public void saveDailyRecommendations() {
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul")); // MySQL과 java의 시간대가 어긋날 수 있음을 방지
 
         // 추천 카테고리 정의 (고정)
         Map<String, String> categoryMap = Map.of(
@@ -38,7 +39,7 @@ public class FixedRecommendationService {
         // 각 카테고리별로 추천 생성
         categoryMap.forEach((key, keyword) -> {
             // 1. 기존 추천 삭제 (해당 날짜+장르)
-            fixedRecommendedMovieRepository.deleteByRecommendedDateAndGenreContaining(today, keyword);
+            fixedRecommendedMovieRepository.deleteAll(); // 모든 추천 싹 삭제
 
             // 2. 원본 영화 테이블에서 장르 포함 영화 조회
             List<Movie> candidates = movieQueryRepository.findMoviesByGenreKeyword(keyword);
