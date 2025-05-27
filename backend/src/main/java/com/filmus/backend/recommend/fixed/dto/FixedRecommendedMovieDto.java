@@ -3,7 +3,7 @@ package com.filmus.backend.recommend.fixed.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-@Schema(description = "추천 영화 응답 DTO")
+@Schema(description = "고정된 추천 영화 응답 DTO")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 public class FixedRecommendedMovieDto {
 
-    @Schema(description = "KMDB 영화 ID", example = "20230101")
+    @Schema(description = "KMDB 영화 ID", example = "F")
     private String movieId;
 
     @Schema(description = "KMDB 영화 일련번호", example = "0001")
@@ -21,7 +21,7 @@ public class FixedRecommendedMovieDto {
     private String title;
 
     @Schema(description = "개봉 연도", example = "2010")
-    private String prodyear;
+    private String year;
 
     @Schema(description = "장르", example = "액션, SF")
     private String genre;

@@ -1,18 +1,18 @@
-// package: com.filmus.backend.recommend.award.dto
+package com.filmus.backend.recommend.weather.dto;
 
-package com.filmus.backend.recommend.award.dto;
-
+import com.filmus.backend.movie.entity.Movie;
+import com.filmus.backend.recommend.award.dto.AwardRecommendedMovieDto;
 import com.filmus.backend.recommend.award.entity.AwardRecommendedMovie;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
-@Schema(description = "수상내역 기반 추천 영화 응답 DTO")
+/**
+ * 날씨 추천 응답용 영화 DTO
+ */
 @Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
-public class AwardRecommendedMovieDto {
+public class WeatherRecommendedMovieDto {
 
     @Schema(description = "KMDB 영화 ID", example = "F")
     private String movieId;
@@ -32,13 +32,12 @@ public class AwardRecommendedMovieDto {
     @Schema(description = "포스터 URL", example = "http://...")
     private String posterUrl;
 
-
-    public static AwardRecommendedMovieDto from(AwardRecommendedMovie movie) {
-        return AwardRecommendedMovieDto.builder()
+    public static WeatherRecommendedMovieDto from(Movie movie) {
+        return WeatherRecommendedMovieDto.builder()
                 .movieId(movie.getMovieId())
                 .movieSeq(movie.getMovieSeq())
                 .title(movie.getTitle())
-                .year(movie.getYear())
+                .year(movie.getProdYear())  // 주의: Movie는 prodYear로 되어 있을 것
                 .genre(movie.getGenre())
                 .posterUrl(movie.getPosterUrl())
                 .build();

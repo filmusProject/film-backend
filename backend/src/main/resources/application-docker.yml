@@ -29,6 +29,10 @@ spring:
           auth: true
           starttls:
             enable: true
+  cache:
+    cache-names: weatherRecommendation  # 사용할 캐시 이름 정의
+    caffeine:
+      spec: maximumSize=1000, expireAfterWrite=1h  # 캐시 최대 1000개, 1시간 동안 유지
 
 springdoc:
   api-docs:
@@ -43,15 +47,20 @@ kmdb:
   base-url: http://api.koreafilm.or.kr
   service-key: ${KMDB_SERVICE_KEY}
 
+weather:
+  api:
+    url: https://api.openweathermap.org/data/2.5/weather
+    key: ${WEATHER_KEY}
+
 jwt:
   secret: ${JWT_SECRET}
 
-aws:
-  enabled: true
-  region: ap-northeast-2
-  nlp-instance-id: ${NLP_INSTANCE_ID}
-  startTimeoutSec: 120
-  stopDelayMin: 30
+#aws:
+#  enabled: true
+#  region: ap-northeast-2
+#  nlp-instance-id: ${NLP_INSTANCE_ID}
+#  startTimeoutSec: 120
+#  stopDelayMin: 30
 
 nlp:
   baseUrl: ${NLP_BASEURL}
