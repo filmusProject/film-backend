@@ -1,5 +1,7 @@
 package com.filmus.backend.security;
 
+import com.filmus.backend.oauth.handler.OAuth2SuccessHandler;
+import com.filmus.backend.oauth.service.CustomOAuth2UserService;
 import com.filmus.backend.token.service.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,8 +25,10 @@ import java.util.Arrays;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtTokenProvider jwtTokenProvider;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtTokenProvider jwtTokenProvider;                       // JWT 생성/검증을 위한 유틸
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;         // JWT 인증 필터
+    private final CustomOAuth2UserService customOAuth2UserService;         // 카카오 사용자 정보 처리 서비스
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;               // 로그인 성공 후 JWT 발급 및 리다이렉트
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -41,13 +45,21 @@ public class SecurityConfig {
                 .headers(headers -> headers
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(form -> form.disable())
-                .httpBasic(httpBasic -> httpBasic.disable());
+                .oauth2Login(oauth2 -> oauth2         // ✅ 소셜 로그인 설정 시작
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService))              // 사용자 정보 처리
+                        .successHandler(oAuth2SuccessHandler)                       // 로그인 성공 후 토큰 발급 및 리다이렉트
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 등록
+                .formLogin(form -> form.disable())  // 기본 로그인 폼 비활성화
+                .httpBasic(httpBasic -> httpBasic.disable());  // HTTP Basic 인증 비활성화
 
         return http.build();
     }
 
+    /**
+     * CORS 설정
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -57,7 +69,7 @@ public class SecurityConfig {
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
@@ -66,8 +78,11 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    /**
+//     * 비밀번호 암호화를 위한 Bcrypt 설정
+//     */
+//    @Bean
+//    public BCryptPasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 }
