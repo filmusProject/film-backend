@@ -5,6 +5,7 @@ import com.filmus.backend.security.UserDetailsImpl;
 import com.filmus.backend.token.service.JwtTokenProvider;
 import com.filmus.backend.auth.service.*;
 import com.filmus.backend.token.service.TokenService;
+import com.filmus.backend.user.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -22,6 +23,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 인증 관련 요청을 처리하는 컨트롤러입니다.
  */
@@ -36,6 +40,8 @@ public class AuthController {
     private final TokenService tokenService;
     private final EmailVerificationService emailVerificationService;
     private final FindUsernameService findUsernameService;
+    private final UserRepository userRepository;
+
 
 
 
@@ -52,7 +58,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-
 
 
 
