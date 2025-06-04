@@ -38,7 +38,7 @@ public class EmailService {
         try {
             String token = emailVerificationService.generateToken(user);
             // 인증 링크 생성
-            String verificationUrl = "http://filmus.o-r.kr/api/auth/verify-email?token=" + token;
+            String verificationUrl = "http://api.filmus.o-r.kr/api/auth/verify-email?token=" + token;
 
             // 이메일 본문 구성
             String subject = "Filmus 회원가입 이메일 인증";
