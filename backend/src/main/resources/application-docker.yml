@@ -18,7 +18,7 @@ spring:
         format_sql: true
         show_sql: true
 
-    security:
+  security:
       oauth2:
         client:
           registration:
