@@ -57,38 +57,11 @@ public class UserController {
         return ResponseEntity.ok("비밀번호가 변경되었습니다.");
     }
 
-//    @Operation(summary = "회원 탈퇴", description = "현재 로그인된 사용자를 탈퇴 처리합니다.")
-//    @DeleteMapping("/delete")
-//    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        userService.deleteUser(userDetails.getUser());
-//        return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
-//    }
-    @Operation(summary = "회원 탈퇴", description = "비밀번호 확인 후 계정을 삭제합니다.",
-            security = @SecurityRequirement(name = "BearerAuth"))
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            content = @Content(
-                    mediaType = "application/json",
-                    examples = @ExampleObject(
-                            name = "탈퇴 요청 예시",
-                            value = "{\"password\": \"myPassword123\"}"
-                    )
-            )
-    )
-
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @Valid @RequestBody DeleteAccountRequestDto request,
-            HttpServletResponse response) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증된 사용자만 탈퇴할 수 있습니다.");
-        }
-
-        try {
-            userService.deleteAccountWithPassword(userDetails.getUser(), request.getPassword(), response);
-            return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
+   @Operation(summary = "회원 탈퇴", description = "현재 로그인된 사용자를 탈퇴 처리합니다.")
+   @DeleteMapping("/delete")
+   public ResponseEntity<String> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+       userService.deleteUser(userDetails.getUser());
+       return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+   }
+   
 }
