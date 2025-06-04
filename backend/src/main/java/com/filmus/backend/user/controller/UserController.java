@@ -1,14 +1,21 @@
 package com.filmus.backend.user.controller;
 
 
+import com.filmus.backend.auth.dto.DeleteAccountRequestDto;
 import com.filmus.backend.security.UserDetailsImpl;
 import com.filmus.backend.user.dto.ChangePasswordRequestDto;
 import com.filmus.backend.user.dto.UpdateUserInfoRequestDto;
 import com.filmus.backend.user.dto.UserInfoResponseDto;
 import com.filmus.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -50,10 +57,11 @@ public class UserController {
         return ResponseEntity.ok("비밀번호가 변경되었습니다.");
     }
 
-    @Operation(summary = "회원 탈퇴", description = "현재 로그인된 사용자를 탈퇴 처리합니다.")
-    @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        userService.deleteUser(userDetails.getUser());
-        return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
-    }
+   @Operation(summary = "회원 탈퇴", description = "현재 로그인된 사용자를 탈퇴 처리합니다.")
+   @DeleteMapping("/delete")
+   public ResponseEntity<String> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+       userService.deleteUser(userDetails.getUser());
+       return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+   }
+   
 }
