@@ -164,7 +164,7 @@ public class MovieService {
     /**
      * 검색 URI 생성
      */
-    private URI buildUri(UriBuilder builder, SearchRequestDTO req, int listCount, int startCount) {
+    public URI buildUri(UriBuilder builder, SearchRequestDTO req, int listCount, int startCount) {
         builder.path("/openapi-data2/wisenut/search_api/search_json2.jsp")
                 .queryParam("ServiceKey", serviceKey)
                 .queryParam("listCount", listCount)

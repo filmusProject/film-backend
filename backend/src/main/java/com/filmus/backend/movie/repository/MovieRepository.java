@@ -1,6 +1,7 @@
 package com.filmus.backend.movie.repository;
 
 import com.filmus.backend.movie.entity.Movie;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -29,6 +30,9 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
            """)
     List<Movie> findForKeywordExtraction();
 
+    @Query("SELECT m FROM Movie m WHERE m.id > :lastId ORDER BY m.id ASC")
+    List<Movie> findNextBatch(Long lastId, Pageable pageable);
+
 //    @Query("""
 //           select m
 //           from Movie m
@@ -41,4 +45,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecific
 
     // MovieRepository.java
     List<Movie> findByGenreContaining(String genre);
+
+    boolean existsByDocid(String docid);
 }
