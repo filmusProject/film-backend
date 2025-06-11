@@ -69,6 +69,10 @@ dependencies {
 
 	implementation 'org.hibernate.validator:hibernate-validator'
 
+	implementation "org.opensearch.client:opensearch-rest-high-level-client:2.4.0"
+	implementation "com.fasterxml.jackson.core:jackson-databind"
+	implementation "org.apache.lucene:lucene-core:9.9.1"
+
 }
 
 tasks.named('test') {

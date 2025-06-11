@@ -1,12 +1,17 @@
 package com.filmus.backend.movie.controller;
 
 import com.filmus.backend.movie.dto.*;
+import com.filmus.backend.movie.es.EsMovieSearchService;
 import com.filmus.backend.movie.service.MovieService;
+import com.filmus.backend.movie.sync.EsMovieIndexLoader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 
 @Tag(name = "영화 API", description = "KMDb 영화 검색 및 상세 정보 조회 API")
@@ -16,15 +21,34 @@ import org.springframework.web.bind.annotation.*;
 public class MovieController {
 
     private final MovieService movieService;
+    private final EsMovieSearchService esMovieSearchService;
+    private final EsMovieIndexLoader indexLoader;
 
     @Operation(
             summary = "영화 검색 API",
-            description = "사용자가 입력한 영화 제목, 감독, 배우 등의 키워드를 기반으로 KMDb OpenAPI를 통해 영화를 검색하고 결과에 대해 간단한 영화ID, 영화 제목, 영화 개봉년도, 영화 포스터 주소 정보로 이루어진 리스트를 반환합니다.."
+            description = "검색 엔진 선택(sql 또는 es)과 키워드 및 필터를 기반으로 영화 목록을 반환합니다."
     )
-    @GetMapping(value = "/search")
-    public SearchResponseDTO search(SearchRequestDTO request) {
-        return movieService.search(request);
+    @GetMapping("/search")
+    public SearchResponseDTO search(
+            @ModelAttribute SearchRequestDTO request,
+            @RequestParam(value = "engine", defaultValue = "sql") String engine
+    ) throws IOException {
+        if ("es".equalsIgnoreCase(engine)) {
+            // Elasticsearch/OpenSearch 검색
+            return esMovieSearchService.search(request);
+        } else {
+            // 기본 SQL(JPA) 검색
+            return movieService.search(request);
+        }
     }
+//    @Operation(
+//            summary = "영화 검색 API",
+//            description = "사용자가 입력한 영화 제목, 감독, 배우 등의 키워드를 기반으로 KMDb OpenAPI를 통해 영화를 검색하고 결과에 대해 간단한 영화ID, 영화 제목, 영화 개봉년도, 영화 포스터 주소 정보로 이루어진 리스트를 반환합니다.."
+//    )
+//    @GetMapping(value = "/search")
+//    public SearchResponseDTO search(SearchRequestDTO request) {
+//        return movieService.search(request);
+//    }
 
 
     @Operation(
@@ -45,4 +69,15 @@ public class MovieController {
         return ResponseEntity.ok(result);
     }
 
+    @PostMapping("/reindex")
+    public ResponseEntity<String> reindexMovies() {
+        try {
+            indexLoader.reindexAll();
+            return ResponseEntity.ok("Reindex job completed successfully.");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Reindex failed: " + e.getMessage());
+        }
+    }
 }
+
