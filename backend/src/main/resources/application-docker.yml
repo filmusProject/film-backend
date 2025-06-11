@@ -92,3 +92,22 @@ kakao:
 
 oauth2:
   redirect-uri: ${OAUTH2_REDIRECT_URI}
+
+search:
+  score:
+    poster: 1.5
+    still: 0.8
+    runtime: 0.5
+    long-plot: 1.0
+    awards1: 1.2
+    awards2: 1.1
+    actor-rich: 0.7
+    director: 0.5
+    prod-year-factor: 0.01
+
+opensearch:
+  host: ${OPENSEARCH_HOST}
+  port: ${OPENSEARCH_PORT}
+  scheme: ${OPENSEARCH_SCHEME}
+  username: ${OPENSEARCH_USERNAME}
+  password: ${OPENSEARCH_PASSWORD}
