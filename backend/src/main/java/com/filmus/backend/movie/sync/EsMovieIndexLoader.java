@@ -31,7 +31,7 @@ public class EsMovieIndexLoader {
     private final PageStateRepository stateRepo;
 
     private static final String INDEX = "movies";
-    private static final int PAGE_SIZE = 1000;
+    private static final int PAGE_SIZE = 500;
 
     /**
      * SQL DB에서 마지막 처리 페이지부터 이어서 ES에 Bulk 색인.
